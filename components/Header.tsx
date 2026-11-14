@@ -2,7 +2,6 @@ import Link from "next/link";
 import { site } from "@/lib/site";
 
 const navItems = [
-  { href: "/#about", label: "About" },
   { href: "/#work", label: "Work" },
   { href: "/#contact", label: "Contact" },
 ];
