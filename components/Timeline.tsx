@@ -1,31 +1,11 @@
 import { ES, GB, US } from "country-flag-icons/react/3x2";
+import Link from "next/link";
 import { LinkPills } from "@/components/LinkPill";
-import { ProjectCard } from "@/components/ProjectCard";
 import { SideProjects } from "@/components/SideProjects";
 import { getProject, type Project } from "@/lib/projects";
 import type { Country, Degree, TimelineEntry } from "@/lib/timeline";
 
 const flags: Record<Country, typeof US> = { US, ES, GB };
-
-type Row =
-  | { kind: "entry"; key: string; entry: TimelineEntry }
-  | { kind: "project"; key: string; project: Project };
-
-function toRows(entries: TimelineEntry[]): Row[] {
-  return entries.flatMap((entry) => {
-    const projectRows = (entry.projectSlugs ?? [])
-      .map(getProject)
-      .filter((project) => project !== undefined)
-      .map((project): Row => ({ kind: "project", key: project.slug, project }));
-
-    const entryRow: Row = {
-      kind: "entry",
-      key: `${entry.title}-${entry.period}`,
-      entry,
-    };
-    return [entryRow, ...projectRows];
-  });
-}
 
 export function Timeline({ entries }: { entries: TimelineEntry[] }) {
   return (
@@ -39,47 +19,36 @@ export function Timeline({ entries }: { entries: TimelineEntry[] }) {
         </span>
       </p>
       <ol className="relative before:absolute before:top-2 before:bottom-0 before:left-[7px] before:w-px before:bg-line md:before:left-1/2">
-        {toRows(entries).map((row, index) => {
+        {entries.map((entry, index) => {
           const onLeft = index % 2 === 0;
           const column = onLeft ? "md:col-start-1" : "md:col-start-2";
+          const opposite = onLeft ? "md:col-start-2" : "md:col-start-1";
           const dotPosition =
             "absolute top-2 left-0 md:left-1/2 md:-translate-x-1/2";
+          const projects = (entry.projectSlugs ?? [])
+            .map(getProject)
+            .filter((project) => project !== undefined);
 
           return (
             <li
-              key={row.key}
+              key={`${entry.title}-${entry.period}`}
               className="relative pb-14 pl-10 last:pb-0 md:grid md:grid-cols-2 md:gap-16 md:pl-0"
             >
-              {row.kind === "entry" ? (
-                <>
-                  {row.entry.kind === "education" ? (
-                    <EducationDot className={dotPosition} />
-                  ) : (
-                    <WorkDot className={dotPosition} />
-                  )}
-                  <EntryContent
-                    entry={row.entry}
-                    className={`${column} md:row-start-1 ${onLeft ? "md:text-right" : ""}`}
-                    alignEnd={onLeft}
-                  />
-                  {row.entry.sideProjects && (
-                    <div
-                      className={`md:row-start-1 md:pt-14 ${onLeft ? "md:col-start-2" : "md:col-start-1"}`}
-                    >
-                      <SideProjects projects={row.entry.sideProjects} />
-                    </div>
-                  )}
-                </>
+              {entry.kind === "education" ? (
+                <EducationDot className={dotPosition} />
               ) : (
-                <>
-                  <span
-                    aria-hidden="true"
-                    className="absolute top-8 left-[3px] h-[9px] w-[9px] rounded-full border-2 border-ink bg-bg md:left-1/2 md:-translate-x-1/2"
-                  />
-                  <div className={column}>
-                    <ProjectCard project={row.project} />
-                  </div>
-                </>
+                <WorkDot className={dotPosition} />
+              )}
+              <EntryContent
+                entry={entry}
+                projects={projects}
+                className={`${column} md:row-start-1 ${onLeft ? "md:text-right" : ""}`}
+                alignEnd={onLeft}
+              />
+              {entry.sideProjects && (
+                <div className={`md:row-start-1 md:pt-14 ${opposite}`}>
+                  <SideProjects projects={entry.sideProjects} />
+                </div>
               )}
             </li>
           );
@@ -111,10 +80,12 @@ function EducationDot({ className }: { className: string }) {
 
 function EntryContent({
   entry,
+  projects,
   className,
   alignEnd,
 }: {
   entry: TimelineEntry;
+  projects: Project[];
   className: string;
   alignEnd: boolean;
 }) {
@@ -142,6 +113,22 @@ function EntryContent({
           className={`mt-3 max-w-md leading-relaxed text-ink-muted ${alignEnd ? "md:ml-auto" : ""}`}
         >
           {entry.summary}
+        </p>
+      )}
+      {projects.length > 0 && (
+        <p className="mt-3 text-sm text-ink-muted">
+          Case studies:{" "}
+          {projects.map((project, i) => (
+            <span key={project.slug}>
+              {i > 0 && " · "}
+              <Link
+                href={`/projects/${project.slug}`}
+                className="text-ink underline decoration-highlight decoration-2 underline-offset-4"
+              >
+                {project.shortTitle}
+              </Link>
+            </span>
+          ))}
         </p>
       )}
       {entry.degrees && (

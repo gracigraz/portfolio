@@ -52,11 +52,12 @@ Two page types:
 
 1. **Home (`/`)**, one scrolling page:
    - Hero and intro in one section: "Hi, I'm Grace." with two short paragraphs (recent work first, then the aerospace-to-software path) beside an editorial mosaic (rectangular B&W photo tiles + sage/cream color blocks), CSS Grid
-   - `#work` timeline, **newest → oldest**, so Rivio and the 3 case-study cards appear first; the skill filter sits right above them
+   - `#work` "Selected work": the 3 case-study cards (3 columns on desktop, stacked on mobile)
+   - `#experience` timeline, **newest → oldest**: jobs and education, with Rivio first. The skill filter (planned) sits above the Selected work cards
    - `#contact` "Let's talk" + the contact form
 2. **Project pages (`/projects/[slug]`)**, one per case study
 
-No separate `/about` or `/contact` pages. Header nav: Work `/#work`, Contact `/#contact`; the name links to the top.
+No separate `/about` or `/contact` pages. Header nav: Work `/#work`, Experience `/#experience`, Contact `/#contact`; the name links to the top.
 
 ### Timeline layout
 - A straight 1px vertical line (`--line`), no curves: curves drift when entries have different heights or text wraps
@@ -64,7 +65,8 @@ No separate `/about` or `/contact` pages. Header nav: Work `/#work`, Contact `/#
 - **Desktop (`md:`):** line centered, entries alternating left and right
 - Large Instrument Serif year markers; small forest dots on the line
 - **Quiet entries** (jobs, education): 2 to 3 lines
-- **Project cards** (3, under Rivio): cream `--surface` background, diagram thumbnail, skill tags, "Read case study →". Visibly different so they're never buried
+- **Rivio entry:** a "Case studies:" line linking to the three case-study pages (the cards themselves live in Selected work above)
+- **Reveal animation (Selected work cards):** cards fade up as they scroll into view using CSS scroll-driven animations (`animation-timeline: view()`), no JavaScript. Wrapped in `@supports` and `prefers-reduced-motion: no-preference`, so unsupported browsers and reduced-motion users simply see the cards
 - **Work vs. education:** work entries get a solid forest dot; education entries a gold diamond and an italic year; a legend above the timeline explains both
 - **Degrees:** education entries list each credential as a small bordered card with an SVG country flag (`country-flag-icons/react/3x2`, `aria-hidden`; the place is in the text)
 - Data in `lib/timeline.ts`, typed; project cards reference `lib/projects.ts` by slug
@@ -91,7 +93,7 @@ app/
 components/
   ContactForm.tsx         "use client"; form UI + state machine
   Hero.tsx                "Hi, I'm Grace." intro + photo mosaic
-  PhotoTile.tsx           next/image tile, or a labeled placeholder until a photo exists
+  PhotoTile.tsx           next/image tile: grayscale by default, with optional color and focal point
   Timeline.tsx            the work/education timeline (server component)
   ProjectCard.tsx         case-study card shown on the timeline
   SideProjects.tsx        "use client"; collapsible list of earlier projects

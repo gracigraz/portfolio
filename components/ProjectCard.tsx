@@ -1,21 +1,29 @@
 import Link from "next/link";
 import type { Project } from "@/lib/projects";
 
-export function ProjectCard({ project }: { project: Project }) {
+export function ProjectCard({
+  project,
+  className = "",
+}: {
+  project: Project;
+  className?: string;
+}) {
   return (
-    <article className="group relative rounded-card bg-surface p-5 transition-shadow hover:shadow-md has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-4 has-[a:focus-visible]:outline-ink sm:p-6">
+    <article
+      className={`group relative flex flex-col rounded-card bg-surface p-5 transition-shadow hover:shadow-md has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-4 has-[a:focus-visible]:outline-ink ${className}`}
+    >
       <div
         aria-hidden="true"
-        className="mb-5 h-24 rounded-xl bg-[linear-gradient(135deg,var(--accent)_0%,var(--accent)_45%,transparent_45%)] bg-bg"
+        className="mb-4 h-14 rounded-xl bg-[linear-gradient(135deg,var(--accent)_0%,var(--accent)_45%,transparent_45%)] bg-bg"
       />
-      <h4 className="font-serif text-2xl leading-tight">
+      <h3 className="font-serif text-2xl leading-tight">
         <Link
           href={`/projects/${project.slug}`}
           className="outline-none after:absolute after:inset-0 after:rounded-card"
         >
           {project.title}
         </Link>
-      </h4>
+      </h3>
       <p className="mt-3 text-sm leading-relaxed text-ink-muted">
         {project.summary}
       </p>
@@ -31,7 +39,7 @@ export function ProjectCard({ project }: { project: Project }) {
       </ul>
       <p
         aria-hidden="true"
-        className="mt-5 text-sm font-medium text-ink group-hover:underline"
+        className="mt-auto pt-5 text-sm font-medium text-ink group-hover:underline"
       >
         Read case study →
       </p>

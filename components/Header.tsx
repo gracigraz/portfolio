@@ -3,6 +3,7 @@ import { site } from "@/lib/site";
 
 const navItems = [
   { href: "/#work", label: "Work" },
+  { href: "/#experience", label: "Experience" },
   { href: "/#contact", label: "Contact" },
 ];
 
