@@ -27,7 +27,7 @@ export function BackToTop() {
       <a
         href="#top"
         inert={!visible}
-        className={`fixed right-4 bottom-4 z-40 rounded-full bg-ink px-4 py-3 text-sm text-bg shadow-md transition-opacity sm:right-8 sm:bottom-8 ${visible ? "opacity-100" : "pointer-events-none opacity-0"}`}
+        className={`fixed right-4 bottom-4 z-40 rounded-full bg-ink px-4 py-3 text-sm text-bg shadow-md ring-2 ring-bg transition-opacity sm:right-8 sm:bottom-8 ${visible ? "opacity-100" : "pointer-events-none opacity-0"}`}
       >
         <span aria-hidden="true">↑</span> Back to top
       </a>

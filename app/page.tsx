@@ -1,3 +1,4 @@
+import { ContactForm } from "@/components/ContactForm";
 import { Hero } from "@/components/Hero";
 import { ProjectCard } from "@/components/ProjectCard";
 import { Timeline } from "@/components/Timeline";
@@ -57,15 +58,22 @@ export default function Home() {
       <section
         id="contact"
         aria-labelledby="contact-heading"
-        className="scroll-mt-8 bg-ink text-bg"
+        className="scroll-mt-8 border-t border-line bg-surface"
       >
-        <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-8">
-          <h2 id="contact-heading" className="font-serif text-5xl sm:text-6xl">
-            Let&apos;s talk
-          </h2>
-          <p className="mt-4 max-w-xl text-bg/80">
-            The contact form is coming next.
-          </p>
+        <div className="mx-auto grid w-full max-w-6xl gap-12 px-4 py-20 sm:px-8 md:grid-cols-[2fr_3fr] md:gap-16">
+          <div>
+            <h2
+              id="contact-heading"
+              className="font-serif text-5xl sm:text-6xl"
+            >
+              Let&apos;s talk
+            </h2>
+            <p className="mt-4 max-w-md text-lg text-ink-muted">
+              Building something, hiring, or just curious about a project? Send
+              me a note and I&apos;ll get back to you.
+            </p>
+          </div>
+          <ContactForm />
         </div>
       </section>
     </>

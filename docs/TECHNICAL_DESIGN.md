@@ -106,7 +106,8 @@ supabase/
 lib/
   projects.ts             typed project data (the content)
   timeline.ts             typed timeline entries (jobs, education), newest first
-  supabaseAdmin.ts        server-only Supabase client (service role key); imports "server-only"
+  server/env.ts           requireEnv(): fails loudly when a variable is missing; server-only
+  server/supabaseAdmin.ts server-only Supabase client using the secret key
   validateContact.ts      shared validation, used by client AND server
   validateContact.test.ts (optional)
 ```
@@ -209,6 +210,13 @@ idle ──submit──► (client validation fails) ──► invalid (field er
 
 Never clear what the user typed on error.
 
+Styling on the cream "Let's talk" section:
+- Ivory inputs with a stone border on cream; the "Send message" button is the only dark element (forest pill), so it's the clear primary action
+- Errors are ink text with a gold icon, plus a gold border on the field; color is never the only signal
+- Focus rings are forest (`outline-ink`, about 7:1 on cream); gold would be too faint
+- A field's error clears as soon as the user edits that field, instead of staying until the next submit
+- Validation runs in the browser first (`noValidate` turns off the browser's own popups so messages are consistent), and the server re-validates with the same `validateContact()`
+
 ### 5.3 API contract: `POST /api/contact`
 
 Request (JSON):
@@ -264,7 +272,7 @@ create table public.contact_submissions (
 
 alter table public.contact_submissions enable row level security;
 -- No policies on purpose: anon/public clients can't read or write.
--- The server uses the service role key, which bypasses RLS.
+-- The server uses the secret key (sb_secret_...), which bypasses RLS.
 ```
 
 - The `check` constraints repeat the validation rules, so bad data can't get in even if app code has a bug.
@@ -278,9 +286,9 @@ alter table public.contact_submissions enable row level security;
 | `RESEND_API_KEY` | Vercel project env + local `.env.local` | Never committed. `.env.local` is in `.gitignore` |
 | `CONTACT_TO_EMAIL` | same | Must be the Resend account email (free sender restriction) |
 | `SUPABASE_URL` | same | Project URL. No `NEXT_PUBLIC_` prefix, so it never ships to the browser |
-| `SUPABASE_SERVICE_ROLE_KEY` | same | Server only. Bypasses RLS, so it must never reach client code |
+| `SUPABASE_SECRET_KEY` | same | Supabase secret key (`sb_secret_...`, the newer name for the service role key). Server only: bypasses RLS, so it must never reach client code |
 
-Commit a `.env.example` with the names and empty values.
+Commit a `.env.example` with the names and empty values (`.gitignore` has `.env*` plus `!.env.example`). Server modules import `server-only`, so importing them from client code fails the build.
 
 ---
 
@@ -399,7 +407,7 @@ Manual (required), on the **production URL**:
 
 1. Push to GitHub (public repo)
 2. In Supabase: create the project, run `supabase/schema.sql` in the SQL editor
-3. Import to Vercel, add all four env vars (`RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`) for Production (and Preview if testing previews)
+3. Import to Vercel, add all four env vars (`RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY`) for Production (and Preview if testing previews)
 3. Deploy early (first hour) so deployment isn't a last-minute risk
 4. Submit the **production** URL, not a preview URL
 

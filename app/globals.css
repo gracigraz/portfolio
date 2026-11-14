@@ -33,6 +33,14 @@
     outline: 2px solid var(--ink);
     outline-offset: 3px;
   }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--bg) inset;
+    -webkit-text-fill-color: var(--ink);
+    caret-color: var(--ink);
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
