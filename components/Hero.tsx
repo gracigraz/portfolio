@@ -1,4 +1,5 @@
 import { PhotoTile } from "@/components/PhotoTile";
+import { site } from "@/lib/site";
 
 export function Hero() {
   return (
@@ -31,6 +32,24 @@ export function Hero() {
             its root cause, fix it, and write it down so anyone can repeat it.
           </p>
         </div>
+        <ul className="mt-8 flex gap-6">
+          <li>
+            <a
+              href={site.links.linkedin}
+              className="inline-block py-2 text-ink underline decoration-highlight decoration-2 underline-offset-4"
+            >
+              LinkedIn
+            </a>
+          </li>
+          <li>
+            <a
+              href={site.links.github}
+              className="inline-block py-2 text-ink underline decoration-highlight decoration-2 underline-offset-4"
+            >
+              GitHub
+            </a>
+          </li>
+        </ul>
       </div>
 
       <div className="grid grid-cols-3 grid-rows-3 gap-3">

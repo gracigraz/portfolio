@@ -1,12 +1,25 @@
 export type Country = "US" | "ES" | "GB";
 
+export type Credential = { name: string; years: string };
+
 export type Degree = {
   country: Country;
   place?: string;
-  years: string;
-  degree: string;
   school?: string;
+  credentials: Credential[];
   note?: string;
+};
+
+export type ExternalLink = {
+  label: string;
+  href: string;
+  kind: "code" | "video";
+};
+
+export type SideProject = {
+  name: string;
+  label?: string;
+  links: ExternalLink[];
 };
 
 export type TimelineEntry = {
@@ -17,7 +30,8 @@ export type TimelineEntry = {
   org?: string;
   summary?: string;
   projectSlugs?: string[];
-  link?: { label: string; href: string };
+  links?: ExternalLink[];
+  sideProjects?: SideProject[];
   degrees?: Degree[];
 };
 
@@ -51,7 +65,15 @@ export const timeline: TimelineEntry[] = [
     period: "Dec 2023 to Feb 2024",
     title: "React Native Engineer",
     org: "Try Reeve",
-    summary: "An iOS app built with React Native, Expo, and TypeScript.",
+    summary:
+      "An iOS app in React Native, Expo, and TypeScript for recording audio and playing back memories.",
+    links: [
+      {
+        label: "Demo video",
+        href: "https://www.loom.com/share/7a3cf3e80de4429a8e287f6e36026141",
+        kind: "video",
+      },
+    ],
   },
   {
     kind: "work",
@@ -61,6 +83,13 @@ export const timeline: TimelineEntry[] = [
     org: "Make it MVP",
     summary:
       "An AI group-chat app with React, Firestore, and the OpenAI API. Named MVP of the team.",
+    links: [
+      {
+        label: "Demo video",
+        href: "https://www.loom.com/share/4f71c508ea4145988a3921b8c928c2e3",
+        kind: "video",
+      },
+    ],
   },
   {
     kind: "education",
@@ -71,20 +100,100 @@ export const timeline: TimelineEntry[] = [
     degrees: [
       {
         country: "US",
-        place: "Miami, Florida",
-        years: "Jun to Sep 2023",
-        degree: "Diploma, Software Engineering",
-      },
-      {
-        country: "US",
-        years: "Sep to Oct 2023",
-        degree: "Certificate, Artificial Intelligence",
+        credentials: [
+          { name: "Diploma, Software Engineering", years: "Jun to Sep 2023" },
+          {
+            name: "Certificate, Artificial Intelligence",
+            years: "Sep to Oct 2023",
+          },
+        ],
       },
     ],
-    link: {
-      label: "Earlier projects",
-      href: "https://star-rise-587.notion.site/Portfolio-Graciela-Manzanares-16c72ddc3c6f49eead7dfb50eebeba55",
-    },
+    sideProjects: [
+      {
+        name: "Calm Companion",
+        label: "Capstone",
+        links: [
+          {
+            label: "Code",
+            href: "https://github.com/gracigraz/calm-companion",
+            kind: "code",
+          },
+          {
+            label: "Demo video",
+            href: "https://www.loom.com/share/22178aa9e9b74887a369db31d872840a",
+            kind: "video",
+          },
+        ],
+      },
+      {
+        name: "BrainFlix",
+        links: [
+          {
+            label: "Code",
+            href: "https://github.com/gracigraz/graciela-manzanares-brainflix",
+            kind: "code",
+          },
+          {
+            label: "API code",
+            href: "https://github.com/gracigraz/graciela-manzanares-brainflix-api",
+            kind: "code",
+          },
+          {
+            label: "Demo video",
+            href: "https://www.loom.com/share/612991362a774c5ca21fd3d0075e6488",
+            kind: "video",
+          },
+        ],
+      },
+      {
+        name: "BandSite",
+        links: [
+          {
+            label: "Code",
+            href: "https://github.com/gracigraz/graciela-manzanares-bandsite",
+            kind: "code",
+          },
+          {
+            label: "Demo video",
+            href: "https://www.loom.com/share/78ee7900575a471b98b68f6590033c45",
+            kind: "video",
+          },
+        ],
+      },
+      {
+        name: "InStock",
+        label: "Team project",
+        links: [
+          {
+            label: "Code",
+            href: "https://github.com/gracigraz/instock",
+            kind: "code",
+          },
+          {
+            label: "API code",
+            href: "https://github.com/gracigraz/instock-api",
+            kind: "code",
+          },
+          {
+            label: "Demo video",
+            href: "https://www.loom.com/share/1d302c6a8d5c4de3a856c644e465ed16",
+            kind: "video",
+          },
+        ],
+      },
+      {
+        name: "Industry project",
+        label: "Team project for a cruise line client",
+        links: [
+          {
+            label: "Code",
+            href: "https://github.com/gracigraz/industry-project",
+            kind: "code",
+          },
+        ],
+      },
+    ],
   },
   {
     kind: "work",
@@ -131,24 +240,35 @@ export const timeline: TimelineEntry[] = [
       {
         country: "US",
         place: "San José, California",
-        years: "2016 to 2017",
-        degree: "M.S. Aerospace Engineering",
+        credentials: [
+          {
+            name: "M.S. Aerospace Engineering, GPA 3.8",
+            years: "2016 to 2017",
+          },
+        ],
         school: "San José State University",
       },
       {
         country: "ES",
         place: "Madrid, Spain",
-        years: "2008 to 2015",
-        degree:
-          "M.S. Industrial Engineering, and a bachelor's in Industrial Engineering (Mechanical)",
+        credentials: [
+          {
+            name: "M.S. Industrial Engineering, and a bachelor's in Industrial Engineering (Mechanical)",
+            years: "2008 to 2015",
+          },
+        ],
         school: "Comillas Pontifical University",
         note: "Study abroad at the University of Miami and the University of Illinois Urbana-Champaign",
       },
       {
         country: "GB",
         place: "Wrexham, Wales, UK",
-        years: "2011 to 2012",
-        degree: "B.Eng (Hons) Aeronautical and Mechanical Engineering, First Class",
+        credentials: [
+          {
+            name: "B.Eng (Hons) Aeronautical and Mechanical Engineering, First Class",
+            years: "2011 to 2012",
+          },
+        ],
         school: "Wrexham University",
       },
     ],

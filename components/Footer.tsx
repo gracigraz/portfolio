@@ -1,28 +1,15 @@
+import { cacheLife } from "next/cache";
 import { site } from "@/lib/site";
 
-export function Footer() {
+export async function Footer() {
+  "use cache";
+  cacheLife("days");
+
   return (
     <footer className="border-t border-line">
-      <div className="mx-auto flex w-full max-w-6xl px-4 py-8 sm:px-8">
-        <ul className="flex gap-6 text-sm text-ink-muted">
-          <li>
-            <a
-              href={site.links.linkedin}
-              className="inline-block py-3 transition-colors hover:text-ink"
-            >
-              LinkedIn
-            </a>
-          </li>
-          <li>
-            <a
-              href={site.links.github}
-              className="inline-block py-3 transition-colors hover:text-ink"
-            >
-              GitHub
-            </a>
-          </li>
-        </ul>
-      </div>
+      <p className="mx-auto w-full max-w-6xl px-4 py-6 text-sm text-ink-muted sm:px-8">
+        © {new Date().getFullYear()} {site.name}
+      </p>
     </footer>
   );
 }

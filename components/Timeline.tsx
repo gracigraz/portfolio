@@ -1,5 +1,7 @@
 import { ES, GB, US } from "country-flag-icons/react/3x2";
+import { LinkPills } from "@/components/LinkPill";
 import { ProjectCard } from "@/components/ProjectCard";
+import { SideProjects } from "@/components/SideProjects";
 import { getProject, type Project } from "@/lib/projects";
 import type { Country, Degree, TimelineEntry } from "@/lib/timeline";
 
@@ -16,10 +18,12 @@ function toRows(entries: TimelineEntry[]): Row[] {
       .filter((project) => project !== undefined)
       .map((project): Row => ({ kind: "project", key: project.slug, project }));
 
-    return [
-      { kind: "entry", key: `${entry.title}-${entry.period}`, entry } as Row,
-      ...projectRows,
-    ];
+    const entryRow: Row = {
+      kind: "entry",
+      key: `${entry.title}-${entry.period}`,
+      entry,
+    };
+    return [entryRow, ...projectRows];
   });
 }
 
@@ -55,9 +59,16 @@ export function Timeline({ entries }: { entries: TimelineEntry[] }) {
                   )}
                   <EntryContent
                     entry={row.entry}
-                    className={`${column} ${onLeft ? "md:text-right" : ""}`}
+                    className={`${column} md:row-start-1 ${onLeft ? "md:text-right" : ""}`}
                     alignEnd={onLeft}
                   />
+                  {row.entry.sideProjects && (
+                    <div
+                      className={`md:row-start-1 md:pt-14 ${onLeft ? "md:col-start-2" : "md:col-start-1"}`}
+                    >
+                      <SideProjects projects={row.entry.sideProjects} />
+                    </div>
+                  )}
                 </>
               ) : (
                 <>
@@ -136,17 +147,16 @@ function EntryContent({
       {entry.degrees && (
         <ul className="mt-4 space-y-4 text-left">
           {entry.degrees.map((degree) => (
-            <DegreeItem key={degree.degree} degree={degree} />
+            <DegreeItem key={degree.credentials[0].name} degree={degree} />
           ))}
         </ul>
       )}
-      {entry.link && (
-        <a
-          href={entry.link.href}
-          className="mt-3 inline-block py-2 text-sm text-ink underline decoration-highlight decoration-2 underline-offset-4"
-        >
-          {entry.link.label}
-        </a>
+      {entry.links && (
+        <LinkPills
+          links={entry.links}
+          context={entry.org ?? entry.title}
+          className={`mt-3 ${alignEnd ? "md:justify-end" : ""}`}
+        />
       )}
     </div>
   );
@@ -161,13 +171,21 @@ function DegreeItem({ degree }: { degree: Degree }) {
         aria-hidden="true"
         className="mt-1 h-4 w-6 shrink-0 rounded-[2px] ring-1 ring-line"
       />
-      <div>
-        <p className="font-medium">{degree.degree}</p>
-        <p className="text-sm text-ink-muted">
-          {[degree.school, degree.place, degree.years]
-            .filter(Boolean)
-            .join(" · ")}
-        </p>
+      <div className="space-y-1">
+        {degree.credentials.map((credential) => (
+          <p key={credential.name}>
+            <span className="font-medium">{credential.name}</span>
+            <span className="text-sm text-ink-muted">
+              {" "}
+              · {credential.years}
+            </span>
+          </p>
+        ))}
+        {(degree.school || degree.place) && (
+          <p className="text-sm text-ink-muted">
+            {[degree.school, degree.place].filter(Boolean).join(" · ")}
+          </p>
+        )}
         {degree.note && (
           <p className="mt-1 text-sm text-ink-muted italic">{degree.note}</p>
         )}

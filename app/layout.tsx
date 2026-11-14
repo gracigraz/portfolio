@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Instrument_Serif } from "next/font/google";
 import { BackToTop } from "@/components/BackToTop";
-import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
 import { site } from "@/lib/site";
 import "./globals.css";
 
