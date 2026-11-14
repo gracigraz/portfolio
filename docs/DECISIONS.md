@@ -49,6 +49,13 @@ The guiding constraint: a 4 to 6 hour build where polish and clear priorities ma
 | One interactive feature: a skill filter | People reviewing a portfolio scan by skill; tags already live in the project data | Full-text site search (three projects means nothing to search) |
 | Filtering on the home page only | Reading query params on project pages would make them dynamic instead of static | `?skill=` highlighting on project pages |
 | Native form elements styled with Tailwind | Four elements; native ones are accessible by default and need no library | shadcn/ui |
+| Two page types: one scrolling home page (hero, intro, timeline, contact) + a page per project | Fewer, fuller pages; no thin standalone About or Contact page | Separate `/about` and `/contact` pages |
+| Timeline newest → oldest, with the 3 projects as distinct cards under the current role | The case studies are what reviewers look for, so they come first; earlier roles and education stay available below | Oldest first (projects buried at the bottom) |
+| Straight vertical timeline line, alternating sides on desktop, left-aligned on mobile | Survives uneven entry heights, text wrapping, and browser zoom with no layout math | A curved SVG path (drifts as content reflows) |
+| Work and education look different on the timeline: forest dot vs. gold diamond, plus a small legend | Easy to scan a mixed career at a glance without labeling every entry | An "Education" tag on each entry (redundant with the marker) |
+| Degree flags as SVGs (`country-flag-icons`), not emoji | Windows doesn't render flag emoji (shows letters like "ES"); SVGs look the same everywhere | Emoji flags |
+| Floating "Back to top" button that appears after about 1.5 screens of scrolling | The timeline makes the page long; the button stays out of the way until it's useful. Hidden state is `inert` so keyboard users never tab into an invisible control; uses `IntersectionObserver`, not a scroll listener | A footer-only link (only helps once you reach the bottom); an always-visible button |
+| Hero as a rectangular editorial mosaic | Same collage feel as a cut-out silhouette, but calm, and it reflows cleanly with CSS Grid | Silhouette photo collage |
 | Scope in tiers: core first (pages, form, mobile, accessibility, deploy, previews), then next/previous links and the skill filter, then stretch (dark theme, timeline) | Protects the polish of what matters most | Building everything at once |
 
 ---

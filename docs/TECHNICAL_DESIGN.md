@@ -46,6 +46,38 @@ Only `/api/contact` runs server code. The browser never talks to Supabase or Res
 
 ---
 
+## 2b. Page structure (revised 2026-11-14)
+
+Two page types:
+
+1. **Home (`/`)**, one scrolling page:
+   - `#top` hero: editorial mosaic (rectangular B&W photo tiles + sage/cream color blocks + name in large serif), CSS Grid, placeholders until real photos
+   - `#about` short intro: concrete work first, then the aerospace-to-software path
+   - `#work` timeline, **newest → oldest**, so Rivio and the 3 case-study cards appear first; the skill filter sits right above them
+   - `#contact` "Let's talk" + the contact form
+2. **Project pages (`/projects/[slug]`)**, one per case study
+
+No separate `/about` or `/contact` pages. Header nav: Work `/#work`, About `/#about`, Contact `/#contact`.
+
+### Timeline layout
+- A straight 1px vertical line (`--line`), no curves: curves drift when entries have different heights or text wraps
+- **Mobile:** line on the left, entries stacked to its right
+- **Desktop (`md:`):** line centered, entries alternating left and right
+- Large Instrument Serif year markers; small forest dots on the line
+- **Quiet entries** (jobs, education): 2 to 3 lines
+- **Project cards** (3, under Rivio): cream `--surface` background, diagram thumbnail, skill tags, "Read case study →". Visibly different so they're never buried
+- **Work vs. education:** work entries get a solid forest dot; education entries a gold diamond and an italic year; a legend above the timeline explains both
+- **Degrees:** education entries list each credential as a small bordered card with an SVG country flag (`country-flag-icons/react/3x2`, `aria-hidden`; the place is in the text)
+- Data in `lib/timeline.ts`, typed; project cards reference `lib/projects.ts` by slug
+
+### Back to top
+- `components/BackToTop.tsx` (client component): a fixed pill, bottom right
+- An invisible sentinel covering the first ~1.5 screens; `IntersectionObserver` shows the button once it scrolls out of view
+- Hidden state uses `inert` + `opacity-0`, so it can't be focused or clicked while invisible
+- Links to `#top` (on `<body>`); smooth scrolling comes from CSS and is turned off under `prefers-reduced-motion`
+
+---
+
 ## 3. File structure
 
 ```
@@ -54,7 +86,6 @@ app/
   page.tsx                home / intro
   projects/
     [slug]/page.tsx       one project page, generated from data (generateStaticParams)
-  contact/page.tsx        contact page, renders <ContactForm />
   api/
     contact/route.ts      POST handler: validate, save to Supabase, send via Resend
   not-found.tsx           friendly 404
@@ -67,6 +98,7 @@ supabase/
   schema.sql              contact_submissions table + RLS
 lib/
   projects.ts             typed project data (the content)
+  timeline.ts             typed timeline entries (jobs, education), newest first
   supabaseAdmin.ts        server-only Supabase client (service role key); imports "server-only"
   validateContact.ts      shared validation, used by client AND server
   validateContact.test.ts (optional)
