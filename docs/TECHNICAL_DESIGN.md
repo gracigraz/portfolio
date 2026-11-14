@@ -1,0 +1,365 @@
+# Portfolio Site: Technical Design
+
+Companion to [DECISIONS.md](DECISIONS.md) (the why). This doc is the what: how the site is built.
+Last updated: 2026-11-13
+
+---
+
+## 1. Overview
+
+A small Next.js site with three kinds of pages and one backend endpoint.
+
+```
+Browser
+  │  pages are static HTML (built ahead of time, served from Vercel's CDN)
+  │
+  │  contact form: fetch POST /api/contact (JSON)
+  ▼
+Next.js Route Handler  app/api/contact/route.ts   (runs on Vercel's server, holds the secrets)
+  │  1. parse JSON   2. honeypot check   3. validate
+  │  4. INSERT into Supabase (Postgres) ──► contact_submissions table
+  │  5. build + send email
+  ▼
+Resend API  (RESEND_API_KEY from env)
+  ▼
+My inbox  (from onboarding@resend.dev, replyTo = visitor's email)
+  │
+  6. UPDATE row: email_status = 'sent' or 'failed'
+```
+
+Only `/api/contact` runs server code. The browser never talks to Supabase or Resend directly. Everything else is static, so pages load fast and there's almost nothing that can break in production.
+
+---
+
+## 2. Stack
+
+| Piece | Choice |
+|---|---|
+| Framework | Next.js (App Router) + TypeScript |
+| Styling | Tailwind CSS |
+| UI primitives | Native `<label>`, `<input>`, `<textarea>`, `<button>` styled with Tailwind tokens. No component library: only 4 form elements, and native elements are accessible by default |
+| Email | Resend Node SDK |
+| Database | Supabase (hosted Postgres), `@supabase/supabase-js`, server-side only |
+| Hosting | Vercel, free `.vercel.app` domain |
+| Tests | Vitest for the validation function (optional, if time allows) |
+| Validation | Hand-written function, no Zod (see section 6) |
+
+---
+
+## 3. File structure
+
+```
+app/
+  layout.tsx              root layout: <html lang="en">, fonts, header/nav, footer, skip link
+  page.tsx                home / intro
+  projects/
+    [slug]/page.tsx       one project page, generated from data (generateStaticParams)
+  contact/page.tsx        contact page, renders <ContactForm />
+  api/
+    contact/route.ts      POST handler: validate, save to Supabase, send via Resend
+  not-found.tsx           friendly 404
+components/
+  ContactForm.tsx         "use client"; form UI + state machine
+  ProjectCard.tsx         card on home page linking to a project
+  diagrams/               one SVG diagram per project, in the site palette (see 4.3)
+  Header.tsx, Footer.tsx
+supabase/
+  schema.sql              contact_submissions table + RLS
+lib/
+  projects.ts             typed project data (the content)
+  supabaseAdmin.ts        server-only Supabase client (service role key); imports "server-only"
+  validateContact.ts      shared validation, used by client AND server
+  validateContact.test.ts (optional)
+```
+
+---
+
+## 4. Content model
+
+Projects are typed data in `lib/projects.ts`. No CMS; project content doesn't touch the database (only contact submissions do).
+
+```ts
+export type Project = {
+  slug: string;            // URL: /projects/{slug}
+  title: string;
+  summary: string;         // one line for the card
+  role: string;            // what I owned
+  problem: string;
+  decisions: { title: string; detail: string }[];
+  results: string[];
+  skills: Skill[];         // tags shown on the card and page; drive the skill filter
+  links?: { label: string; href: string }[]; // only public links
+  image?: { src: string; alt: string };      // card / hero tile
+};
+
+export type Skill = "TypeScript" | "React" | "Next.js" | "Python" | "AWS" | "LLM agents" | ...;
+// A union type, so a typo in a tag is a compile error and filter chips can't drift from the data.
+```
+
+### 4.1 Skill filter
+
+- Chips generated from the distinct skills across projects (sorted by how many projects use each)
+- Click a chip → state `activeSkill`; matching cards stay full, others dim (opacity, not hidden, so layout doesn't jump)
+- Chips are `<button aria-pressed>`; a polite live region announces "2 projects use AWS"
+- Clicking the active chip again clears it; works with keyboard
+- Filtering lives on the home page only. Project pages do **not** read `?skill=`: reading `searchParams` would opt them out of static generation, and `useSearchParams()` needs a `<Suspense>` boundary. Dimming cards on the home page delivers the feature without that cost
+- Respect `prefers-reduced-motion` for the dim transition
+
+### 4.3 Project visuals
+
+The past projects are proprietary, so there are no screenshots to show. Instead, each project gets a simple SVG diagram in the site palette (ivory, forest, sage), drawn as a React component:
+- Renewal workflow: the three guardrail layers, or the task lifecycle
+- Admin tool: the three-phase merge flow
+- Zip investigation: the filter funnel (vendors in → buckets out)
+
+These look intentional and editorial, explain the work at a glance, and don't depend on finding images. Hero photos use placeholders until real ones are added.
+
+### 4.2 Next / previous
+
+Computed from the order of `projects` in `lib/projects.ts`; wraps around or hides at the ends. Links use the project titles, not just "Next."
+
+Content rules for project write-ups:
+- Only claims backed by the actual commit history
+- No customer names or internal details (past work is confidential)
+- No links to private code
+
+---
+
+## 5. Contact form
+
+### 5.1 Fields
+
+| Field | Input | Rules |
+|---|---|---|
+| name | `text`, `autocomplete="name"` | required, 1 to 100 chars after trim |
+| email | `email`, `autocomplete="email"` | required, basic email shape, max 254 chars |
+| message | `textarea` | required, 10 to 5,000 chars after trim |
+| company (honeypot) | hidden `text`, `tabIndex={-1}`, `autocomplete="off"`, `aria-hidden="true"`, visually hidden with CSS | must be empty |
+
+The honeypot is named something a bot would want to fill in ("company"). Humans never see it.
+
+Privacy note shown under the form (small text): **"Your details are only used to reply to you."**
+
+### 5.1b Where a submission's content lives
+
+| Place | Contains the message text? | Purpose |
+|---|---|---|
+| My inbox | Yes | Read and reply |
+| Resend dashboard | Yes (the sent email, including the body) | Check delivery, see what was sent |
+| Supabase `contact_submissions` | Yes | Durable record |
+| Vercel server logs | **No**, only outcome and IDs (e.g. `contact(): sent (id = ...)`) | Debugging without copying personal data into logs |
+
+No email address is published on the site, so it can't be scraped; the form is the only way in.
+
+### 5.2 UI states
+
+```
+idle ──submit──► (client validation fails) ──► invalid (field errors shown, focus first bad field)
+  │
+  └─submit──► submitting ──200──► success
+                    └────non-200 / network error──► error ──retry──► submitting
+```
+
+| State | What the user sees | Accessibility |
+|---|---|---|
+| idle | form ready | labels on every field |
+| invalid | message under each bad field, focus moves to the first one | `aria-invalid="true"`, `aria-describedby` → error text |
+| submitting | button disabled, label "Sending..." | `aria-busy="true"` on form; button stays focusable text |
+| success | form replaced by a thank-you card: "Thanks, {name}. I'll reply within 2 days." plus a "Send another message" button that resets the form | card is `<div ref={successRef} tabIndex={-1} role="status">` and focus is moved to it explicitly (`successRef.current?.focus()`). Relying only on a newly mounted `aria-live` region often isn't announced, and unmounting the form would otherwise drop focus to `<body>` |
+| error | form keeps typed text; "Something went wrong. Please try again, or message me on LinkedIn." (link) | `role="alert"`. LinkedIn instead of an email address, so no address is published on the site |
+
+Never clear what the user typed on error.
+
+### 5.3 API contract: `POST /api/contact`
+
+Request (JSON):
+```json
+{ "name": "Ada", "email": "ada@example.com", "message": "Hi...", "company": "" }
+```
+
+Responses:
+
+| Case | Status | Body |
+|---|---|---|
+| Sent | 200 | `{ "ok": true }` |
+| Honeypot filled | 200 | `{ "ok": true }` (fake success, nothing sent, so bots don't learn) |
+| Invalid input | 400 | `{ "ok": false, "errors": { "email": "Enter a valid email" } }` |
+| Body isn't valid JSON | 400 | `{ "ok": false, "error": "Invalid request" }` |
+| Saved, but Resend failed | 200 | `{ "ok": true }` (the message is safely stored; the failure is recorded as `email_status = 'failed'` so I can see it) |
+| Database insert failed | 500 | `{ "ok": false, "error": "Could not send message" }` (nothing saved, so tell the user to retry) |
+| Wrong method | 405 | (Next.js handles it: only `POST` is exported) |
+
+Never return Resend's raw error or stack trace to the browser.
+
+### 5.4 Handler steps (`app/api/contact/route.ts`)
+
+1. Parse JSON. On failure → 400.
+2. If `company` is non-empty → 200 fake success, stop.
+3. Run `validateContact(body)`. If errors → 400 with field errors.
+4. Insert the row into `contact_submissions` (`email_status = 'pending'`). On failure → log, return 500.
+5. Call `resend.emails.send` with:
+   - `from: "Portfolio <onboarding@resend.dev>"`
+   - `to: <my Resend account email>` (from env `CONTACT_TO_EMAIL`)
+   - `replyTo: <visitor email>` (check the SDK version for the exact field name)
+   - `subject: "Portfolio message from {name}"`
+   - `text:` name, email, message
+6. Update the row: `email_status = 'sent'`, or `'failed'` if Resend returned an error. **The Resend SDK does not throw on API errors**: `const { data, error } = await resend.emails.send(...)` resolves even on a 401/403. Check `if (error)` explicitly before marking `'sent'` (log it server side, no message content in logs).
+7. Return 200.
+
+Send plain text, not HTML built from user input. That avoids any HTML injection into the email.
+
+Why save first: if Resend is down, the message is still stored and visible in Supabase. Email first would lose it.
+
+### 5.4b Database: `contact_submissions`
+
+```sql
+create table public.contact_submissions (
+  id            uuid primary key default gen_random_uuid(),
+  created_at    timestamptz not null default now(),
+  name          text not null check (char_length(name) between 1 and 100),
+  email         text not null check (char_length(email) <= 254),
+  message       text not null check (char_length(message) between 10 and 5000),
+  email_status  text not null default 'pending'
+                check (email_status in ('pending', 'sent', 'failed'))
+);
+
+alter table public.contact_submissions enable row level security;
+-- No policies on purpose: anon/public clients can't read or write.
+-- The server uses the service role key, which bypasses RLS.
+```
+
+- The `check` constraints repeat the validation rules, so bad data can't get in even if app code has a bug.
+- Save the SQL as `supabase/schema.sql` in the repo so reviewers can see it.
+- View submissions in the Supabase dashboard's Table Editor.
+
+### 5.5 Environment variables
+
+| Name | Where | Notes |
+|---|---|---|
+| `RESEND_API_KEY` | Vercel project env + local `.env.local` | Never committed. `.env.local` is in `.gitignore` |
+| `CONTACT_TO_EMAIL` | same | Must be the Resend account email (free sender restriction) |
+| `SUPABASE_URL` | same | Project URL. No `NEXT_PUBLIC_` prefix, so it never ships to the browser |
+| `SUPABASE_SERVICE_ROLE_KEY` | same | Server only. Bypasses RLS, so it must never reach client code |
+
+Commit a `.env.example` with the names and empty values.
+
+---
+
+## 6. Validation: why no Zod (yet)
+
+**Decision:** a small hand-written `validateContact()` in `lib/validateContact.ts`, imported by both the form (instant feedback) and the Route Handler (the real check).
+
+Why:
+- 3 fields with simple rules: about 20 lines of plain TypeScript.
+- One less dependency, and the reviewer can read the whole rule set at a glance.
+- Sharing one function between client and server already gives the main benefit people use Zod for: one source of truth.
+- **The server always re-validates.** Client checks are for user experience; anyone can skip the browser and POST directly.
+
+**When Zod is the right call (say this in the walkthrough):**
+- Bigger forms (many fields, nested objects, conditional rules)
+- When you want TypeScript types inferred from the schema instead of written twice
+- Forms built with React Hook Form, where `zodResolver` connects the schema to the form
+- Validating external API responses, not just user input
+
+> "For three fields, a shared validation function is clearer than a schema library. On a bigger form I'd use Zod so the schema is the single source of truth for both the types and the runtime checks."
+
+---
+
+## 6a. Design tokens and fonts
+
+- Colors as CSS variables in `app/globals.css` mapped into Tailwind's theme so classes read `bg-bg text-ink`:
+
+| Token | Hex | Use | Text-safe on `--bg`? |
+|---|---|---|---|
+| `--bg` | `#FAF9F4` ivory | page background | n/a |
+| `--ink` | `#0F5132` forest | headings, body text, primary buttons | yes, ~8.9:1 |
+| `--ink-muted` | `#4F5D4A` deep olive | secondary text, captions | yes, ~6.7:1 |
+| `--surface` | `#E8E1D5` warm cream | section bands, cards | n/a |
+| `--accent` | `#A8B5A2` sage | photo overlay blocks, chip backgrounds, dividers | **no** (~2:1), never for text |
+| `--highlight` | `#C8A96B` muted gold | tiny details (active-filter dot, underline) | **no**, decoration only |
+| `--line` | `#D6D3C8` stone | borders, input outlines | n/a |
+- Dark theme (stretch) = the same variables redefined under `[data-theme="dark"]`, so no component changes
+- Fonts via `next/font/google`: `Instrument_Serif` (headings, weight 400 + italic) and `Inter` (body), exposed as CSS variables `--font-serif` / `--font-sans`
+- Radius tokens: pill (`9999px`) for buttons, inputs, chips; `16px` for cards and images
+- Form elements read these tokens directly, so restyling is one place
+
+---
+
+## 6b. Metadata and link previews
+
+This is what backs the "pre-rendered pages give proper link previews" argument, so it must actually be built.
+
+- Root `metadata` in `app/layout.tsx`: site title template (`%s | Graciela Manzanares`), description, `metadataBase` set to the production URL
+- Per-page `metadata` / `generateMetadata` for each project page (title + one-line summary)
+- Open Graph + Twitter card tags (Next.js generates these from `metadata.openGraph`)
+- One preview image: `app/opengraph-image.png` (1200x630) or generated with `ImageResponse`
+- Favicon (`app/icon.png`)
+- Test: paste the production URL into LinkedIn's Post Inspector and a Slack message; confirm title, description, image show
+
+---
+
+## 7. Accessibility checklist
+
+- Semantic landmarks: `<header>`, `<nav>`, `<main>`, `<footer>`; one `<h1>` per page
+- "Skip to content" link as the first focusable element
+- Every input has a visible `<label>`; required fields are marked in text, not only by color
+- Visible focus ring on every interactive element (don't remove outlines)
+- Color contrast at least 4.5:1 for body text (check with the browser DevTools contrast checker)
+- Keyboard: whole site usable with Tab / Shift+Tab / Enter, no traps
+- Images have meaningful `alt` (decorative ones `alt=""`)
+- Respect `prefers-reduced-motion` for any animation
+- Lighthouse accessibility score 95+ and an axe DevTools pass, screenshot both for the walkthrough
+
+---
+
+## 8. Responsive design
+
+- Mobile first. Base styles target a ~375px phone; Tailwind `md:` and `lg:` add layout for larger screens
+- Side padding 16px on mobile; content max width ~720px for reading pages
+- Nav collapses to a simple stacked or menu layout on small screens
+- Tap targets at least 44px tall
+- Test: a real phone + DevTools at 375, 768, 1280 widths
+
+---
+
+## 9. Testing plan
+
+Automated (if time):
+- Vitest unit tests for `validateContact`: valid input, each missing field, bad email, too-long message, whitespace-only input
+
+Manual (required), on the **production URL**:
+
+| Test | Expected |
+|---|---|
+| Valid submission | "Sending..." then success; email arrives; Reply goes to visitor address; row in Supabase with `email_status = 'sent'` |
+| Break `RESEND_API_KEY` in a preview deploy, submit | User still sees success; row saved with `email_status = 'failed'` |
+| After every production test | Don't trust the green UI alone (it shows success once the row is saved): confirm the email landed **and** the row says `email_status = 'sent'` |
+| Empty submit | field errors, focus on first error, nothing sent |
+| Bad email | email field error |
+| Turn off wifi, submit | error message, typed text kept |
+| Keyboard only, full flow | works with no mouse |
+| Phone | layout fine, keyboard doesn't hide the button |
+| `curl` POST with honeypot filled | 200, no email arrives |
+| `curl` POST with missing fields | 400 with field errors (proves the server validates) |
+
+---
+
+## 10. Deployment
+
+1. Push to GitHub (public repo)
+2. In Supabase: create the project, run `supabase/schema.sql` in the SQL editor
+3. Import to Vercel, add all four env vars (`RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`) for Production (and Preview if testing previews)
+3. Deploy early (first hour) so deployment isn't a last-minute risk
+4. Submit the **production** URL, not a preview URL
+
+---
+
+## 11. Out of scope (goes in "with more time")
+
+- A retry job that resends emails for rows stuck at `email_status = 'failed'`
+- A small admin page to read submissions (behind auth) instead of the Supabase dashboard
+- Rate limiting per IP, Cloudflare Turnstile
+- Custom domain + verified sender, optional confirmation email with abuse protection
+- Zod + React Hook Form if the form grows
+- End-to-end test of the form (Playwright) and axe checks in CI
+- Analytics
