@@ -23,14 +23,16 @@
   --radius-card: 1rem;
 }
 
-body {
-  background: var(--bg);
-  color: var(--ink);
-}
+@layer base {
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
 
-:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 3px;
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {

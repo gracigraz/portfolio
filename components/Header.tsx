@@ -2,9 +2,9 @@ import Link from "next/link";
 import { site } from "@/lib/site";
 
 const navItems = [
-  { href: "/#work", label: "Work" },
   { href: "/#about", label: "About" },
-  { href: "/contact", label: "Contact" },
+  { href: "/#work", label: "Work" },
+  { href: "/#contact", label: "Contact" },
 ];
 
 export function Header() {
