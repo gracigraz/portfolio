@@ -1,5 +1,5 @@
 import { PhotoTile } from "@/components/PhotoTile";
-import { site } from "@/lib/site";
+import { SocialLinks } from "@/components/SocialLinks";
 
 export function Hero() {
   return (
@@ -32,34 +32,13 @@ export function Hero() {
             its root cause, fix it, and write it down so anyone can repeat it.
           </p>
         </div>
-        <ul className="mt-8 flex gap-6">
-          <li>
-            <a
-              href={site.links.linkedin}
-              className="inline-block py-2 text-ink underline decoration-highlight decoration-2 underline-offset-4"
-            >
-              LinkedIn
-            </a>
-          </li>
-          <li>
-            <a
-              href={site.links.github}
-              className="inline-block py-2 text-ink underline decoration-highlight decoration-2 underline-offset-4"
-            >
-              GitHub
-            </a>
-          </li>
-        </ul>
+        <SocialLinks className="mt-8" />
       </div>
 
       <div className="relative">
         <div
           aria-hidden="true"
-          className="absolute -bottom-2 -left-2 h-[72%] w-[68%] rounded-3xl bg-accent lg:-bottom-3 lg:-left-3"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute -top-2 -right-2 h-20 w-20 rounded-3xl bg-highlight/70 lg:-top-3 lg:-right-3 lg:h-24 lg:w-24"
+          className="absolute -bottom-2 -left-2 h-[72%] w-[68%] rounded-3xl bg-accent lg:-bottom-5 lg:-left-5"
         />
         <div className="relative grid auto-rows-[110px] grid-cols-3 gap-3 lg:auto-rows-[130px] lg:grid-cols-4">
           <PhotoTile

@@ -33,6 +33,7 @@ export type TimelineEntry = {
   links?: ExternalLink[];
   sideProjects?: SideProject[];
   degrees?: Degree[];
+  foundation?: boolean;
 };
 
 export const timeline: TimelineEntry[] = [
@@ -69,7 +70,7 @@ export const timeline: TimelineEntry[] = [
       "An iOS app in React Native, Expo, and TypeScript for recording audio and playing back memories.",
     links: [
       {
-        label: "Demo video",
+        label: "Watch demo",
         href: "https://www.loom.com/share/7a3cf3e80de4429a8e287f6e36026141",
         kind: "video",
       },
@@ -85,7 +86,7 @@ export const timeline: TimelineEntry[] = [
       "An AI group-chat app with React, Firestore, and the OpenAI API. Named MVP of the team.",
     links: [
       {
-        label: "Demo video",
+        label: "Watch demo",
         href: "https://www.loom.com/share/4f71c508ea4145988a3921b8c928c2e3",
         kind: "video",
       },
@@ -95,20 +96,10 @@ export const timeline: TimelineEntry[] = [
     kind: "education",
     year: "2023",
     period: "Jun 2023 to Oct 2023",
-    title: "BrainStation",
+    org: "BrainStation",
+    title:
+      "Diploma, Software Engineering · Certificate, Artificial Intelligence",
     summary: "Where I made the switch to software.",
-    degrees: [
-      {
-        country: "US",
-        credentials: [
-          { name: "Diploma, Software Engineering", years: "Jun to Sep 2023" },
-          {
-            name: "Certificate, Artificial Intelligence",
-            years: "Sep to Oct 2023",
-          },
-        ],
-      },
-    ],
     sideProjects: [
       {
         name: "Calm Companion",
@@ -120,7 +111,7 @@ export const timeline: TimelineEntry[] = [
             kind: "code",
           },
           {
-            label: "Demo video",
+            label: "Demo",
             href: "https://www.loom.com/share/22178aa9e9b74887a369db31d872840a",
             kind: "video",
           },
@@ -135,12 +126,12 @@ export const timeline: TimelineEntry[] = [
             kind: "code",
           },
           {
-            label: "API code",
+            label: "API",
             href: "https://github.com/gracigraz/graciela-manzanares-brainflix-api",
             kind: "code",
           },
           {
-            label: "Demo video",
+            label: "Demo",
             href: "https://www.loom.com/share/612991362a774c5ca21fd3d0075e6488",
             kind: "video",
           },
@@ -155,7 +146,7 @@ export const timeline: TimelineEntry[] = [
             kind: "code",
           },
           {
-            label: "Demo video",
+            label: "Demo",
             href: "https://www.loom.com/share/78ee7900575a471b98b68f6590033c45",
             kind: "video",
           },
@@ -171,12 +162,12 @@ export const timeline: TimelineEntry[] = [
             kind: "code",
           },
           {
-            label: "API code",
+            label: "API",
             href: "https://github.com/gracigraz/instock-api",
             kind: "code",
           },
           {
-            label: "Demo video",
+            label: "Demo",
             href: "https://www.loom.com/share/1d302c6a8d5c4de3a856c644e465ed16",
             kind: "video",
           },
@@ -236,6 +227,7 @@ export const timeline: TimelineEntry[] = [
     year: "2008",
     period: "2008 to 2017",
     title: "Engineering degrees",
+    foundation: true,
     degrees: [
       {
         country: "US",
@@ -253,7 +245,7 @@ export const timeline: TimelineEntry[] = [
         place: "Madrid, Spain",
         credentials: [
           {
-            name: "M.S. Industrial Engineering, and a bachelor's in Industrial Engineering (Mechanical)",
+            name: "M.S. + B.S. Industrial Engineering (Mechanical)",
             years: "2008 to 2015",
           },
         ],

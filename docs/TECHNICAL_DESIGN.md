@@ -52,7 +52,7 @@ Two page types:
 
 1. **Home (`/`)**, one scrolling page:
    - Hero and intro in one section: "Hi, I'm Grace." with two short paragraphs (recent work first, then the aerospace-to-software path) beside an editorial mosaic (rectangular B&W photo tiles + sage/cream color blocks), CSS Grid
-   - `#work` "Selected work": the 3 case-study cards (3 columns on desktop, stacked on mobile)
+   - `#work` "Selected work": an editorial bento: project 01 as a full-width feature card (text + diagram side by side), 02 and 03 half width below; stacked on mobile
    - `#experience` timeline, **newest → oldest**: jobs and education, with Rivio first. The skill filter (planned) sits above the Selected work cards
    - `#contact` "Let's talk" + the contact form
 2. **Project pages (`/projects/[slug]`)**, one per case study
@@ -60,13 +60,11 @@ Two page types:
 No separate `/about` or `/contact` pages. Header nav: Work `/#work`, Experience `/#experience`, Contact `/#contact`; the name links to the top.
 
 ### Timeline layout
-- A straight 1px vertical line (`--line`), no curves: curves drift when entries have different heights or text wraps
-- **Mobile:** line on the left, entries stacked to its right
-- **Desktop (`md:`):** line centered, entries alternating left and right
-- Large Instrument Serif year markers; small forest dots on the line
-- **Quiet entries** (jobs, education): 2 to 3 lines
-- **Rivio entry:** a "Case studies:" line linking to the three case-study pages (the cards themselves live in Selected work above)
-- **Reveal animation (Selected work cards):** cards fade up as they scroll into view using CSS scroll-driven animations (`animation-timeline: view()`), no JavaScript. Wrapped in `@supports` and `prefers-reduced-motion: no-preference`, so unsupported browsers and reduced-motion users simply see the cards
+- A single reading axis ("ledger"): on desktop, three columns: year + period (right-aligned) | a 1px line with the marker | company, role, summary. On mobile, the line runs down the left with everything to its right
+- The line is drawn per entry (from its marker to the next), so it stops at the last entry's marker
+- Company first (`font-medium`), role below in muted text: the company is what people scan for
+- The final education entry is a "foundation": the line ends at its diamond and the three degrees sit below as a row of three cards spanning the full section width (wider than the timeline column, so long degree names don't cramp). Text flows top-down: flag + years, degree, school and city, note; stacked on mobile
+- Groups use one soft surface (`bg-surface/60` + border) instead of separate hollow boxes (the earlier-projects list, the degree cards). BrainStation credentials are a single text line; its bootcamp projects are collapsed by default
 - **Work vs. education:** work entries get a solid forest dot; education entries a gold diamond and an italic year; a legend above the timeline explains both
 - **Degrees:** education entries list each credential as a small bordered card with an SVG country flag (`country-flag-icons/react/3x2`, `aria-hidden`; the place is in the text)
 - Data in `lib/timeline.ts`, typed; project cards reference `lib/projects.ts` by slug
@@ -97,7 +95,7 @@ components/
   Timeline.tsx            the work/education timeline (server component)
   ProjectCard.tsx         case-study card shown on the timeline
   SideProjects.tsx        "use client"; collapsible list of earlier projects
-  LinkPill.tsx            code / demo-video link pills with icons
+  ExternalLinks.tsx       quiet inline code / demo links with icons, separated by dots
   BackToTop.tsx           "use client"; floating back-to-top button
   diagrams/               one SVG diagram per project, in the site palette (see 4.3)
   Header.tsx, Footer.tsx  Footer is a cached component (see section 6)
@@ -334,7 +332,7 @@ Checked against the docs bundled in `node_modules/next/dist/docs/`.
 | `--ink` | `#0F5132` forest | headings, body text, primary buttons | yes, ~8.9:1 |
 | `--ink-muted` | `#4F5D4A` deep olive | secondary text, captions | yes, ~6.7:1 |
 | `--surface` | `#E8E1D5` warm cream | section bands, cards | n/a |
-| `--accent` | `#A8B5A2` sage | photo overlay blocks, chip backgrounds, dividers | **no** (~2:1), never for text |
+| `--accent` | `#9FBA96` sage green | hero corner block, diagram fills (at 60% opacity so labels stay above 4.5:1), dividers | **no** (~2:1), never for text |
 | `--highlight` | `#C8A96B` muted gold | tiny details (active-filter dot, underline) | **no**, decoration only |
 | `--line` | `#D6D3C8` stone | borders, input outlines | n/a |
 - Dark theme (stretch) = the same variables redefined under `[data-theme="dark"]`, so no component changes

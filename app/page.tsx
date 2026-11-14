@@ -22,12 +22,14 @@ export default function Home() {
           <p className="mt-4 max-w-xl text-ink-muted">
             Three case studies from my most recent role at Rivio AI.
           </p>
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {projects.map((project) => (
+          <div className="mt-12 grid gap-6 md:grid-cols-2">
+            {projects.map((project, i) => (
               <ProjectCard
                 key={project.slug}
                 project={project}
-                className="reveal-up"
+                index={i + 1}
+                featured={i === 0}
+                className={`reveal-up ${i === 0 ? "md:col-span-2" : ""}`}
               />
             ))}
           </div>
@@ -42,14 +44,14 @@ export default function Home() {
         <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-8">
           <h2
             id="experience-heading"
-            className="font-serif text-5xl sm:text-6xl md:text-center"
+            className="font-serif text-5xl sm:text-6xl"
           >
             Experience
           </h2>
-          <p className="mt-4 max-w-xl text-ink-muted md:mx-auto md:text-center">
+          <p className="mt-4 max-w-xl text-ink-muted">
             The path that led there, newest first.
           </p>
-          <div className="mt-16">
+          <div className="mt-8">
             <Timeline entries={timeline} />
           </div>
         </div>
