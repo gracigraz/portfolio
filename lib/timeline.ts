@@ -34,6 +34,7 @@ export type TimelineEntry = {
   sideProjects?: SideProject[];
   degrees?: Degree[];
   foundation?: boolean;
+  grouped?: boolean;
 };
 
 export const timeline: TimelineEntry[] = [
@@ -209,7 +210,8 @@ export const timeline: TimelineEntry[] = [
     year: "2014",
     period: "2014 to 2019",
     title: "Manufacturing Engineering",
-    org: "C&H Enterprises, Ibérica del Espacio, SJSU Aerodynamics Lab",
+    org: "C&H Enterprises, Ibérica del Espacio",
+    grouped: true,
     summary:
       "New product introduction, and thermal control panels for satellites built for NASA, ESA, and JAXA.",
   },
@@ -219,6 +221,7 @@ export const timeline: TimelineEntry[] = [
     period: "2013 to 2014",
     title: "Internships",
     org: "Viasat Telematics, Empresarios Agrupados, Tecnatom",
+    grouped: true,
     summary:
       "Including my first software work: a GPS fleet-tracking system in Java.",
   },
@@ -239,6 +242,7 @@ export const timeline: TimelineEntry[] = [
           },
         ],
         school: "San José State University",
+        note: "Aerodynamics lab assistant: designed and ran wind and water tunnel experiments",
       },
       {
         country: "ES",

@@ -9,8 +9,8 @@ export function Hero() {
     >
       <div>
         <p className="text-xs tracking-[0.2em] text-ink-muted uppercase">
-          Software engineer · Miami <span aria-hidden="true">→</span>
-          <span className="sr-only">relocating to</span> New York
+          Software engineer 
+
         </p>
         <h1
           id="hero-heading"
@@ -38,7 +38,7 @@ export function Hero() {
       <div className="relative">
         <div
           aria-hidden="true"
-          className="absolute -bottom-2 -left-2 h-[72%] w-[68%] rounded-3xl bg-accent lg:-bottom-5 lg:-left-5"
+          className="absolute -bottom-2 -left-2 h-[72%] w-[68%] rounded-3xl bg-accent-soft lg:-bottom-5 lg:-left-5"
         />
         <div className="relative grid auto-rows-[110px] grid-cols-3 gap-3 lg:auto-rows-[130px] lg:grid-cols-4">
           <PhotoTile

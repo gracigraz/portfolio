@@ -38,10 +38,9 @@ export function Timeline({ entries }: { entries: TimelineEntry[] }) {
                 </span>
                 <Period
                   entry={entry}
-                  className="hidden md:block md:pr-6 md:text-right"
+                  className="mb-2 md:col-start-1 md:row-start-1 md:mb-0 md:pr-6 md:text-right"
                 />
-                <div className="md:col-start-3">
-                  <Period entry={entry} className="mb-2 md:hidden" />
+                <div className="md:col-start-3 md:row-start-1">
                   <EntryContent entry={entry} projects={projects} />
                 </div>
               </li>
@@ -107,8 +106,8 @@ function EntryContent({
   entry: TimelineEntry;
   projects: Project[];
 }) {
-  const heading = entry.org ?? entry.title;
-  const subheading = entry.org ? entry.title : undefined;
+  const heading = entry.grouped ? entry.title : (entry.org ?? entry.title);
+  const subheading = entry.grouped ? entry.org : entry.org && entry.title;
 
   return (
     <div className="max-w-2xl">

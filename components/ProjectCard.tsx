@@ -1,15 +1,6 @@
 import Link from "next/link";
-import type { ComponentType } from "react";
-import { MergeFlow } from "@/components/diagrams/MergeFlow";
-import { RenewalFlow } from "@/components/diagrams/RenewalFlow";
-import { ZipFunnel } from "@/components/diagrams/ZipFunnel";
+import { projectDiagrams } from "@/components/diagrams";
 import type { Project } from "@/lib/projects";
-
-const diagrams: Record<string, ComponentType> = {
-  "ai-agent-renewals": RenewalFlow,
-  "internal-admin-portal": MergeFlow,
-  "zip-sync-investigation": ZipFunnel,
-};
 
 export function ProjectCard({
   project,
@@ -22,7 +13,7 @@ export function ProjectCard({
   featured?: boolean;
   className?: string;
 }) {
-  const Diagram = diagrams[project.slug];
+  const Diagram = projectDiagrams[project.slug];
 
   return (
     <article

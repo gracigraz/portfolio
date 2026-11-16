@@ -19,8 +19,16 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(site.url),
   title: { default: site.name, template: `%s | ${site.name}` },
-  description: `Projects and case studies by ${site.name}.`,
+  description: site.description,
+  openGraph: {
+    type: "website",
+    siteName: site.name,
+    title: site.name,
+    description: site.description,
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -41,7 +41,7 @@ Only `/api/contact` runs server code. The browser never talks to Supabase or Res
 | Email | Resend Node SDK |
 | Database | Supabase (hosted Postgres), `@supabase/supabase-js`, server-side only |
 | Hosting | Vercel, free `.vercel.app` domain |
-| Tests | Vitest for the validation function (optional, if time allows) |
+| Tests | Vitest (`npm test`): unit tests for the pure logic, `validateContact` and the allowlist check |
 | Validation | Hand-written function, no Zod (see section 6) |
 
 ---
@@ -55,7 +55,13 @@ Two page types:
    - `#work` "Selected work": an editorial bento: project 01 as a full-width feature card (text + diagram side by side), 02 and 03 half width below; stacked on mobile
    - `#experience` timeline, **newest → oldest**: jobs and education, with Rivio first. The skill filter (planned) sits above the Selected work cards
    - `#contact` "Let's talk" + the contact form
-2. **Project pages (`/projects/[slug]`)**, one per case study
+2. **Project pages (`/projects/[slug]`)**, one per case study, pre-rendered with `generateStaticParams`; unknown slugs call `notFound()`. Same structure on every page so they're easy to compare:
+   - "← All work" link, numbered category label, title, one-line summary
+   - Facts strip: Role, When, Outcome, plus the stack
+   - The project's diagram, large, on the dot-grid frame
+   - The problem, My role, Key decisions (numbered cards), Results
+   - Previous / next links using the project titles
+   - An interactive demo where available (renewals: the outbound email allowlist simulator, `components/demos/`), built with clearly labeled mock data (reserved `.example` / `.test` domains, fictional names), showing only behavior that was actually built
 
 No separate `/about` or `/contact` pages. Header nav: Work `/#work`, Experience `/#experience`, Contact `/#contact`; the name links to the top.
 
@@ -97,7 +103,7 @@ components/
   SideProjects.tsx        "use client"; collapsible list of earlier projects
   ExternalLinks.tsx       quiet inline code / demo links with icons, separated by dots
   BackToTop.tsx           "use client"; floating back-to-top button
-  diagrams/               one SVG diagram per project, in the site palette (see 4.3)
+  diagrams/               one SVG diagram per project + index.ts mapping slug to diagram
   Header.tsx, Footer.tsx  Footer is a cached component (see section 6)
 supabase/
   schema.sql              contact_submissions table + RLS
@@ -107,7 +113,9 @@ lib/
   server/env.ts           requireEnv(): fails loudly when a variable is missing; server-only
   server/supabaseAdmin.ts server-only Supabase client using the secret key
   validateContact.ts      shared validation, used by client AND server
-  validateContact.test.ts (optional)
+  validateContact.test.ts
+  allowlist.ts            checkRecipient(): exact-domain allowlist check used by the demo
+  allowlist.test.ts
 ```
 
 ---
@@ -333,6 +341,7 @@ Checked against the docs bundled in `node_modules/next/dist/docs/`.
 | `--ink-muted` | `#4F5D4A` deep olive | secondary text, captions | yes, ~6.7:1 |
 | `--surface` | `#E8E1D5` warm cream | section bands, cards | n/a |
 | `--accent` | `#9FBA96` sage green | hero corner block, diagram fills (at 60% opacity so labels stay above 4.5:1), dividers | **no** (~2:1), never for text |
+| `--accent-soft` | `#CFDFC8` pale sage | the large hero backdrop only: lighter than the photos so it sits behind them | n/a (decorative) |
 | `--highlight` | `#C8A96B` muted gold | tiny details (active-filter dot, underline) | **no**, decoration only |
 | `--line` | `#D6D3C8` stone | borders, input outlines | n/a |
 - Dark theme (stretch) = the same variables redefined under `[data-theme="dark"]`, so no component changes
@@ -344,16 +353,11 @@ Checked against the docs bundled in `node_modules/next/dist/docs/`.
 
 ## 6b. Metadata and link previews
 
-This is what backs the "pre-rendered pages give proper link previews" argument, so it must actually be built.
-
-- Root `metadata` in `app/layout.tsx`: site title template (`%s | Graciela Manzanares`), description, `metadataBase` set to the production URL
-- Per-page `metadata` / `generateMetadata` for each project page (title + one-line summary)
-- Open Graph + Twitter card tags (Next.js generates these from `metadata.openGraph`)
-- One preview image: `app/opengraph-image.png` (1200x630) or generated with `ImageResponse`
-- Favicon (`app/icon.png`)
-- Test: paste the production URL into LinkedIn's Post Inspector and a Slack message; confirm title, description, image show
-
----
+- `metadataBase` is the production URL (`site.url`); title template `%s | Graciela Manzanares`; site description in `lib/site.ts`
+- `app/opengraph-image.tsx`: a 1200x630 preview image generated with `ImageResponse` in the site palette, using the bundled Instrument Serif TTF (`assets/`, with its OFL license); applies to every page
+- Project pages set their own title, description, and Open Graph title via `generateMetadata`
+- `app/icon.tsx`: a generated favicon (ivory serif "G" on forest); the default `favicon.ico` was removed
+- Test: paste the production URL into LinkedIn's Post Inspector and a Slack message
 
 ## 7. Accessibility checklist
 
@@ -382,7 +386,8 @@ This is what backs the "pre-rendered pages give proper link previews" argument, 
 ## 9. Testing plan
 
 Automated (if time):
-- Vitest unit tests for `validateContact`: valid input, each missing field, bad email, too-long message, whitespace-only input
+- `validateContact`: valid input and trimming, all missing fields at once, whitespace-only, malformed emails, length limits, non-string values
+- `checkRecipient`: allowed, blocked, look-alike domain (`northwind.example.spoof.test`), subdomain (exact match only), case and spaces, invalid addresses, and more than one `@` (rejected rather than guessed)
 
 Manual (required), on the **production URL**:
 
