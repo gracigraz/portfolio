@@ -54,6 +54,11 @@ supabase/     database schema
 
 ## Templates, libraries, and AI tools
 
-- **Template:** the `create-next-app` starter only. The design is my own.
+- **Template:** the `create-next-app` starter only. The design is custom, not based on a template.
 - **Libraries:** Next.js, React, Tailwind CSS, `@supabase/supabase-js`, `resend`, `server-only`, `country-flag-icons`, and Vitest. Fonts: Inter and Instrument Serif via `next/font`. Instrument Serif is also bundled in `assets/` for the generated images, under the SIL Open Font License.
-- **AI tools:** Claude Code as a pair programmer, for implementation, code review against accessibility and security practices, checking case-study details against the original repositories, and editing the writing. The product and design decisions are mine, and I reviewed and tested every change.
+- **AI tools:**
+  - **Claude Code (Claude Opus 5.5)** as a pair programmer: implementation, code review against accessibility and security practices, checking case-study details against the original repositories, and editing the writing.
+  - **Claude Fable** to explore UI design directions and visual variations.
+  - **Gemini 4 Carbon** as a second opinion when reviewing key decisions.
+
+  The product and design decisions are mine, and I reviewed and tested changes.

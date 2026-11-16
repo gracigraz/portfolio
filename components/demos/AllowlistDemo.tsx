@@ -80,7 +80,7 @@ export function AllowlistDemo() {
           type="email"
           value={email}
           onChange={(event) => reset(event.target.value)}
-          className="mt-1.5 w-full rounded-xl border border-line bg-bg px-3.5 py-2.5 font-mono text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+          className="mt-1.5 w-full rounded-xl border border-line-strong bg-bg px-3.5 py-2.5 font-mono text-base text-ink sm:text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
         />
         <p className="mt-4 text-sm text-ink-muted">
           <span className="font-medium text-ink">Subject:</span> Your software

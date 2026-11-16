@@ -148,7 +148,7 @@ function EntryContent({
               key={link.href}
               link={link}
               context={entry.org ?? entry.title}
-              className="ml-2 inline-flex items-center gap-1.5 text-sm whitespace-nowrap text-ink-muted transition-colors hover:text-ink"
+              className="relative ml-2 inline-flex items-center gap-1.5 text-sm whitespace-nowrap text-ink-muted transition-colors before:absolute before:inset-x-0 before:-inset-y-3 before:content-[''] hover:text-ink"
               labelClassName="underline decoration-line underline-offset-4 group-hover:decoration-highlight"
             />
           ))}

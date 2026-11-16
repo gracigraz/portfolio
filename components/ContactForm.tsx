@@ -20,7 +20,7 @@ type Status = "idle" | "submitting" | "success" | "error";
 const FIELD_ORDER: ContactField[] = ["name", "email", "message"];
 
 const inputClass =
-  "w-full rounded-xl border border-line bg-bg px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-muted/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink aria-invalid:border-2 aria-invalid:border-highlight";
+  "w-full rounded-xl border border-line-strong bg-bg px-3.5 py-2.5 text-base text-ink sm:text-sm placeholder:text-ink-muted/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink aria-invalid:border-2 aria-invalid:border-highlight";
 
 export function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");

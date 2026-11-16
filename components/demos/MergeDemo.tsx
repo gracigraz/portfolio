@@ -114,7 +114,7 @@ export function MergeDemo() {
   }
 
   const selectClass =
-    "mt-1.5 w-full rounded-xl border border-line bg-bg px-3.5 py-2.5 text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:opacity-60";
+    "mt-1.5 w-full rounded-xl border border-line-strong bg-bg px-3.5 py-2.5 text-base sm:text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:opacity-60";
 
   return (
     <div className="rounded-card border border-line bg-surface/60 p-6 sm:p-8">

@@ -102,7 +102,13 @@ export function Node({
       <text
         x={x + 46}
         y={cy + 11}
-        fill={strong ? "var(--bg)" : "var(--ink-muted)"}
+        fill={
+          strong
+            ? "var(--bg)"
+            : tone === "warn"
+              ? "var(--ink)"
+              : "var(--ink-muted)"
+        }
         fillOpacity={strong ? 0.75 : 1}
         fontSize="9"
         fontFamily={

@@ -54,6 +54,7 @@ My submission for the Porter & Co take-home, Option 1: a personal portfolio.
 
 ## What I would build next
 
+- **Help visitors find the right work:** a skill filter, and a natural-language search where a visitor describes what they're looking for and an LLM matches it to the relevant case studies, explaining the match, with keyword search as a fallback
 - Rate limiting on the contact form with a shared store such as Redis
 - A custom sending domain for the contact emails
 - End-to-end and accessibility checks in CI for the form, the video player, and every page

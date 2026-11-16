@@ -5,6 +5,7 @@
   --ink: #0f5132;
   --ink-muted: #5c564e;
   --surface: #ece3d3;
+  --line-strong: #8a8277;
   --accent: #9fba96;
   --highlight: #c8a96b;
   --line: #d6d3c8;
@@ -13,6 +14,7 @@
 @theme inline {
   --color-bg: var(--bg);
   --color-ink: var(--ink);
+  --color-line-strong: var(--line-strong);
   --color-ink-muted: var(--ink-muted);
   --color-surface: var(--surface);
   --color-accent: var(--accent);

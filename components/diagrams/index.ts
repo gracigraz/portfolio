@@ -19,13 +19,14 @@ export const deepDiveDiagrams: Record<string, ComponentType> = {
   "ai-agent-renewals": SigningFlow,
 };
 
-// Diagrams drawn wider than 400 units. On narrow screens their frame scrolls
-// sideways instead of shrinking the labels below a readable size.
-export const wideDiagrams = new Set<ComponentType>([
-  AttributionFlow,
-  PlatformFlow,
-  RenewalStatuses,
-  ThreadsFlow,
-  MergeSteps,
-  SigningFlow,
+// Wide diagrams and the minimum width each keeps on narrow screens (their
+// frame scrolls sideways instead of shrinking labels below a readable size).
+// The widest diagram gets the most room so its text stays about the same size.
+export const wideDiagrams = new Map<ComponentType, string>([
+  [AttributionFlow, "max-sm:min-w-[36rem]"],
+  [PlatformFlow, "max-sm:min-w-[36rem]"],
+  [ThreadsFlow, "max-sm:min-w-[36rem]"],
+  [MergeSteps, "max-sm:min-w-[36rem]"],
+  [SigningFlow, "max-sm:min-w-[36rem]"],
+  [RenewalStatuses, "max-sm:min-w-[44rem]"],
 ]);

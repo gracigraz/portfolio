@@ -52,7 +52,7 @@ export function Hero() {
           </a>
           <a
             href="#contact"
-            className="text-sm font-medium text-ink underline decoration-highlight decoration-2 underline-offset-4 hover:decoration-ink"
+            className="inline-block py-2 text-sm font-medium text-ink underline decoration-highlight decoration-2 underline-offset-4 hover:decoration-ink"
           >
             Get in touch
           </a>

@@ -99,7 +99,7 @@ async function CaseStudy({
         </p>
       </header>
 
-      <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_17rem] lg:gap-14">
+      <div className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[minmax(0,1fr)_17rem] lg:gap-14">
         {Diagram && (
           <figure className="relative flex min-w-0 flex-col">
             <div className="flex flex-1 items-center rounded-card border border-line bg-bg bg-[radial-gradient(var(--line)_1px,transparent_1px)] [background-size:16px_16px] p-6 sm:p-10">
@@ -295,16 +295,17 @@ async function CaseStudy({
 
 // Wide diagrams keep a readable size on narrow screens and scroll sideways.
 function DiagramBody({ Component }: { Component: ComponentType }) {
-  if (!wideDiagrams.has(Component)) return <Component />;
+  const minWidth = wideDiagrams.get(Component);
+  if (!minWidth) return <Component />;
   return (
     <>
       <div
         tabIndex={0}
         role="region"
         aria-label="Diagram (scrolls sideways on small screens)"
-        className="overflow-x-auto rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+        className="overflow-x-auto overflow-y-hidden rounded-lg py-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
       >
-        <div className="min-w-[34rem]">
+        <div className={minWidth}>
           <Component />
         </div>
       </div>
@@ -337,11 +338,11 @@ function Section({
 }) {
   return (
     <section
-      className={`mt-14 grid gap-6 border-t border-line pt-10 ${wide ? "" : "lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-14"}`}
+      className={`mt-14 grid grid-cols-[minmax(0,1fr)] gap-6 border-t border-line pt-10 ${wide ? "" : "lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-14"}`}
     >
       <h2 className="font-serif text-3xl leading-tight lg:text-4xl">{title}</h2>
       <div
-        className={`space-y-4 text-lg leading-relaxed ${wide ? "" : "max-w-3xl"}`}
+        className={`min-w-0 space-y-4 text-lg leading-relaxed ${wide ? "" : "max-w-3xl"}`}
       >
         {children}
       </div>

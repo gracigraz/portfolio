@@ -15,15 +15,15 @@ Browser
   │  contact form: fetch POST /api/contact (JSON)
   ▼
 Next.js Route Handler  app/api/contact/route.ts   (runs on Vercel's server, holds the secrets)
-  │  1. parse JSON   2. honeypot check   3. validate
-  │  4. INSERT into Supabase (Postgres) ──► contact_submissions table
-  │  5. build + send email
+  │  1. read body (413 if oversized)   2. parse JSON   3. honeypot check   4. validate
+  │  5. INSERT into Supabase (Postgres) ──► contact_submissions table
+  │  6. build + send email
   ▼
 Resend API  (RESEND_API_KEY from env)
   ▼
 My inbox  (from onboarding@resend.dev, replyTo = visitor's email)
   │
-  6. UPDATE row: email_status = 'sent' or 'failed'
+  7. UPDATE row: email_status = 'sent' or 'failed'
 ```
 
 Only `/api/contact` runs server code. The browser never talks to Supabase or Resend directly. Everything else is static, so pages load fast and there's almost nothing that can break in production.
@@ -40,8 +40,8 @@ Only `/api/contact` runs server code. The browser never talks to Supabase or Res
 | Email | Resend Node SDK |
 | Database | Supabase (hosted Postgres), `@supabase/supabase-js`, server-side only |
 | Hosting | Vercel, free `.vercel.app` domain |
-| Tests | Vitest (`npm test`): unit tests for the pure logic, `validateContact` and the allowlist check |
-| Validation | Hand-written function, no Zod (see section 6) |
+| Tests | Vitest (`npm test`): unit tests for the pure logic (contact validation, the email allowlist, the supplier merge rules, date formatting, video links) |
+| Validation | Hand-written function, no Zod (see section 5.6) |
 
 ---
 
@@ -50,17 +50,16 @@ Only `/api/contact` runs server code. The browser never talks to Supabase or Res
 Two page types:
 
 1. **Home (`/`)**, one scrolling page:
-   - Hero and intro in one section: "Hi, I'm Grace." with two short paragraphs (recent work first, then the aerospace-to-software path) beside an editorial mosaic (rectangular B&W photo tiles + sage/cream color blocks), CSS Grid
-   - `#work` "Selected work": an editorial bento: project 01 as a full-width feature card (text + diagram side by side), 02 and 03 half width below; stacked on mobile
-   - `#experience` timeline, **newest → oldest**: jobs and education, with Rivio first. The skill filter (planned) sits above the Selected work cards
+   - Hero and intro in one section: "Hi, I'm Grace." with two short paragraphs (recent work first, then the aerospace-to-software path) beside an editorial mosaic (photo tiles over a warm sand block), CSS Grid
+   - `#work` "Selected work": an editorial bento: project 01 as a full-width feature card (text + diagram side by side), 02 and 03 half width below; stacked on mobile. A fourth case study (chat threads) is linked from the timeline
+   - `#experience` timeline, **newest → oldest**: jobs and education
    - `#contact` "Let's talk" + the contact form
 2. **Project pages (`/projects/[slug]`)**, one per case study, pre-rendered with `generateStaticParams`; unknown slugs call `notFound()`. Same structure on every page so they're easy to compare:
    - "← All work" link, numbered category label, title, one-line summary
-   - Facts strip: Role, When, Outcome, plus the stack
-   - The project's diagram, large, on the dot-grid frame
-   - The problem, My role, Key decisions (numbered cards), Results
+   - The project's diagram on the dot-grid frame, beside a facts panel: Role, When, Outcome, live site where public, and the stack
+   - The problem, My role, product screenshots where they're my own, Key decisions (numbered cards), a deep dive with its own smaller diagram, Results, What I'd improve, and a closing takeaway
    - Previous / next links using the project titles
-   - An interactive demo where available (renewals: the outbound email allowlist simulator, `components/demos/`), built with clearly labeled mock data (reserved `.example` / `.test` domains, fictional names), showing only behavior that was actually built
+   - An interactive demo where available (renewals: the outbound email allowlist; admin platform: the supplier merge, `components/demos/`), built with clearly labeled mock data (reserved `.example` / `.test` domains, fictional names), showing only behavior that was actually built
 
 No separate `/about` or `/contact` pages. Header nav: Work `/#work`, Experience `/#experience`, Contact `/#contact`; the name links to the top.
 
@@ -93,18 +92,22 @@ app/
   api/
     contact/route.ts      POST handler: validate, save to Supabase, send via Resend
   not-found.tsx           friendly 404
+  opengraph-image.tsx     generated link-preview image
+  icon.tsx                generated favicon
+  sitemap.ts, robots.ts   search engine metadata
 components/
   ContactForm.tsx         "use client"; form UI + state machine
   Hero.tsx                "Hi, I'm Grace." intro + photo mosaic
   PhotoTile.tsx           next/image tile: grayscale by default, with optional color and focal point
   Timeline.tsx            the work/education timeline (server component)
-  ProjectCard.tsx         case-study card shown on the timeline
+  ProjectCard.tsx         case-study card shown in Selected work
   SideProjects.tsx        "use client"; collapsible list of earlier projects
   ExternalLinks.tsx       ProjectLink (GitHub link in a new tab, or demo video player) and the dot-separated list
   icons.tsx               shared GitHub and play icons
   BackToTop.tsx           "use client"; floating back-to-top button
   VideoLink.tsx           "use client"; demo link that opens the Loom video in a native <dialog> (falls back to a normal link)
-  diagrams/               one SVG diagram per project + index.ts mapping slug to diagram
+  diagrams/               SVG diagrams built from shared parts (Node, Pill, icons); index.ts maps each slug to its diagram
+  demos/                  interactive demos with mock data (AllowlistDemo, MergeDemo)
   Header.tsx, Footer.tsx  Footer is a cached component (see section 6)
 supabase/
   schema.sql              contact_submissions table + RLS
@@ -116,9 +119,10 @@ lib/
   validateContact.ts      shared validation, used by client AND server
   validateContact.test.ts
   allowlist.ts            checkRecipient(): exact-domain allowlist check used by the demo
+  supplierMerge.ts        the supplier merge rules used by the demo
+  period.ts               formats timeline date ranges
   video.ts                loomEmbedUrl(): turns a Loom share link into an embed link (strict match)
-  video.test.ts
-  allowlist.test.ts
+  *.test.ts               unit tests next to each module
 ```
 
 ---
@@ -131,32 +135,35 @@ Projects are typed data in `lib/projects.ts`. No CMS; project content doesn't to
 export type Project = {
   slug: string;            // URL: /projects/{slug}
   title: string;
-  summary: string;         // one line for the card
-  role: string;            // what I owned
-  problem: string;
+  shortTitle: string;      // used in the timeline links
+  category: string;
+  summary: string;         // the card and page summary
+  skills: Skill[];         // tags shown on the card and page
+  role: string;
+  period: string;
+  outcome: string;         // one line, shown on the card
+  website?: { label: string; href: string };  // only public links
+  screens?: { src: string; alt: string; caption: string; width: number; height: number }[];
+  problem: string[];
+  myRole: string[];
   decisions: { title: string; detail: string }[];
+  deepDive?: { title: string; intro: string[]; points: { title: string; detail: string }[] };
   results: string[];
-  skills: Skill[];         // tags shown on the card and page; drive the skill filter
-  links?: { label: string; href: string }[]; // only public links
-  image?: { src: string; alt: string };      // card / hero tile
+  improve?: string[];
+  takeaway?: string;
 };
 
 export type Skill = "TypeScript" | "React" | "Next.js" | "Python" | "AWS" | "LLM agents" | ...;
-// A union type, so a typo in a tag is a compile error and filter chips can't drift from the data.
+// A union type, so a typo in a tag is a compile error.
 ```
 
-### 4.1 Skill filter (planned; replaced by the interactive demos)
+### 4.1 Finding the right work (next step)
 
-- Chips generated from the distinct skills across projects (sorted by how many projects use each)
-- Click a chip → state `activeSkill`; matching cards stay full, others dim (opacity, not hidden, so layout doesn't jump)
-- Chips are `<button aria-pressed>`; a polite live region announces "2 projects use AWS"
-- Clicking the active chip again clears it; works with keyboard
-- Filtering lives on the home page only. Project pages do **not** read `?skill=`: reading `searchParams` would opt them out of static generation, and `useSearchParams()` needs a `<Suspense>` boundary. Dimming cards on the home page delivers the feature without that cost
-- Respect `prefers-reduced-motion` for the dim transition
+The first plan was a skill filter on the home page. With three projects there was little to filter, so the effort went into the interactive demos instead. The next step is to help visitors find relevant work: a skill filter, and a natural-language search where a visitor describes what they're looking for and an LLM matches it to the relevant case studies, explaining the match, with keyword search as a fallback.
 
-### 4.3 Project visuals
+### 4.2 Project visuals
 
-Most of this work is proprietary, so instead of screenshots each project gets an SVG diagram in the site palette (ivory, forest, sage), drawn as a React component:
+Most of this work is proprietary, so instead of screenshots each project gets an SVG diagram in the site palette (cream, forest, sage, gold), drawn as a React component:
 - Renewal workflow: the status machine (with the escalation loop and where the allowlist check runs); a smaller DocuSign signing flow sits inside its deep-dive section
 - Admin platform: the architecture (UI → API → data); a smaller merge-steps diagram sits inside its deep-dive section (`deepDiveDiagrams`)
 - Content attribution: the source carried from video to sale by a cookie
@@ -164,7 +171,7 @@ Most of this work is proprietary, so instead of screenshots each project gets an
 
 These look intentional and editorial, explain the work at a glance, and don't depend on finding images.
 
-### 4.2 Next / previous
+### 4.3 Next / previous
 
 Computed from the order of `projects` in `lib/projects.ts`; wraps around or hides at the ends. Links use the project titles, not just "Next."
 
@@ -250,7 +257,7 @@ Never return Resend's raw error or stack trace to the browser.
 
 ### 5.4 Handler steps (`app/api/contact/route.ts`)
 
-1. Parse JSON. On failure → 400.
+1. Read the body as text; if it's over 20 KB → 413. Then parse JSON; on failure → 400. Any unexpected error returns the same JSON shape with a 500, without details.
 2. If `company` is non-empty → 200 fake success, stop.
 3. Run `validateContact(body)`. If errors → 400 with field errors.
 4. Insert the row into `contact_submissions` (`email_status = 'pending'`). On failure → log, return 500.
@@ -302,7 +309,7 @@ Commit a `.env.example` with the names and empty values (`.gitignore` has `.env*
 
 ---
 
-## 6. Validation: why no Zod (yet)
+### 5.6 Validation: why no Zod (yet)
 
 **Decision:** a small hand-written `validateContact()` in `lib/validateContact.ts`, imported by both the form (instant feedback) and the Route Handler (the real check).
 
@@ -359,7 +366,7 @@ Checked against the docs bundled in `node_modules/next/dist/docs/`.
 - `metadataBase` is the production URL (`site.url`); title template `%s | Graciela Manzanares`; site description in `lib/site.ts`
 - `app/opengraph-image.tsx`: a 1200x630 preview image generated with `ImageResponse` in the site palette, using the bundled Instrument Serif TTF (`assets/`, with its OFL license); applies to every page
 - Project pages set their own title, description, and Open Graph title via `generateMetadata`
-- `app/icon.tsx`: a generated favicon (ivory serif "G" on forest); the default `favicon.ico` was removed
+- `app/icon.tsx`: a generated favicon (cream serif "G" on forest); the default `favicon.ico` was removed
 - Test: paste the production URL into LinkedIn's Post Inspector and a Slack message
 
 ## 7. Accessibility checklist
@@ -372,25 +379,26 @@ Checked against the docs bundled in `node_modules/next/dist/docs/`.
 - Keyboard: whole site usable with Tab / Shift+Tab / Enter, no traps
 - Images have meaningful `alt` (decorative ones `alt=""`)
 - Respect `prefers-reduced-motion` for any animation
-- Lighthouse accessibility score 95+ and an axe DevTools pass, screenshot both for the walkthrough
+- Lighthouse and axe DevTools checks before release
 
 ---
 
 ## 8. Responsive design
 
 - Mobile first. Base styles target a ~375px phone; Tailwind `md:` and `lg:` add layout for larger screens
-- Side padding 16px on mobile; content max width ~720px for reading pages
-- Nav collapses to a simple stacked or menu layout on small screens
-- Tap targets at least 44px tall
-- Test: a real phone + DevTools at 375, 768, 1280 widths
+- Side padding 16px on mobile; reading text capped at ~768px even when the page is wider
+- The header nav stays compact (three short links) at every width
+- Tap targets meet the WCAG 2.2 minimum (24px), with primary buttons larger
+- Test: a real phone, plus an automated check that no page scrolls sideways at 390, 768, and 1024px
 
 ---
 
 ## 9. Testing plan
 
-Automated (if time):
-- `validateContact`: valid input and trimming, all missing fields at once, whitespace-only, malformed emails, length limits, non-string values
+Automated (25 unit tests, `npm test`):
+- `validateContact`: valid input and trimming, all missing fields at once, whitespace-only, malformed emails, characters that would break the reply-to header, length limits, non-string values
 - `checkRecipient`: allowed, blocked, look-alike domain (`northwind.example.spoof.test`), subdomain (exact match only), case and spaces, invalid addresses, and more than one `@` (rejected rather than guessed)
+- `mergeSuppliers`, `periodLines`, `loomEmbedUrl`: the demo merge rules, timeline dates, and video links
 
 Manual (required), on the **production URL**:
 
@@ -423,8 +431,11 @@ Manual (required), on the **production URL**:
 
 - A retry job that resends emails for rows stuck at `email_status = 'failed'`
 - A small admin page to read submissions (behind auth) instead of the Supabase dashboard
-- Rate limiting per IP, Cloudflare Turnstile
+- Rate limiting per IP (for example Redis), Cloudflare Turnstile
 - Custom domain + verified sender, optional confirmation email with abuse protection
 - Zod + React Hook Form if the form grows
 - End-to-end test of the form (Playwright) and axe checks in CI
+- A skill filter and a natural-language project search (see section 4.1)
+- Mobile-specific diagram layouts that stack vertically
+- Case studies in MDX as the writing grows
 - Analytics

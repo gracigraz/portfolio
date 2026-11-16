@@ -88,8 +88,8 @@ The guiding constraint: a 4 to 6 hour build where polish and clear priorities ma
 ## Visual design: "calm editorial"
 
 - **Type:** Instrument Serif for headings, Inter for body. A serif + sans pairing gives the editorial feel; Inter stays readable at small sizes.
-- **Palette:** ivory background, forest and deep-olive text (about 8.9:1 and 6.7:1 contrast), warm cream surfaces, sage and muted gold as accents.
-- **Accessibility rule:** sage and gold are about 2:1 on ivory, so they're never used for text, only for backgrounds and decoration.
+- **Palette:** warm cream background, forest and warm-gray text (about 8.8:1 and 6.8:1 contrast), warm sand surfaces, sage and muted gold as accents. Form fields use a darker border (3.5:1) so their edges meet WCAG non-text contrast.
+- **Accessibility rule:** sage and gold are about 2:1 on the background, so they're never used for text, only for backgrounds and decoration.
 - **One signature detail:** a warm sand block overlapping the photo mosaic, used sparingly.
 
 ---
@@ -102,3 +102,4 @@ The guiding constraint: a 4 to 6 hour build where polish and clear priorities ma
 - A small authenticated admin page for submissions
 - End-to-end test of the form (Playwright) and automated accessibility checks in CI
 - A dark theme
+- A skill filter and a natural-language project search: a visitor describes what they're looking for and an LLM matches it to the relevant case studies, with keyword search as a fallback
