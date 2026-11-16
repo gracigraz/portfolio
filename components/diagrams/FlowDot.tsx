@@ -13,6 +13,7 @@ export function FlowDot({
   return (
     <circle
       r="4.5"
+      style={{ filter: "drop-shadow(0 0 4px var(--highlight))" }}
       fill="var(--highlight)"
       stroke="var(--ink)"
       strokeWidth="1"

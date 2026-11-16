@@ -126,6 +126,7 @@ export function AllowlistDemo() {
       </ol>
 
       <div aria-live="polite" className="mt-4 min-h-24">
+        {running && <p className="sr-only">Checking the recipient…</p>}
         {phase.result && <Result result={phase.result} />}
       </div>
     </div>

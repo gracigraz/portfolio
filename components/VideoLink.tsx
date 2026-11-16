@@ -29,7 +29,8 @@ export function VideoLink({
   const embedUrl = loomEmbedUrl(href);
 
   useEffect(() => {
-    if (open) dialogRef.current?.showModal();
+    const dialog = dialogRef.current;
+    if (open && dialog && !dialog.open) dialog.showModal();
   }, [open]);
 
   function handleClick(event: MouseEvent<HTMLAnchorElement>) {

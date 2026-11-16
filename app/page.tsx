@@ -19,7 +19,7 @@ export default function Home() {
           <h2 id="work-heading" className="font-serif text-5xl sm:text-6xl">
             Selected work
           </h2>
-          <p className="mt-4 max-w-xl text-ink-muted">
+          <p className="mt-4 text-ink-muted">
             A closer look at three projects from Alquimista and Rivio AI, from
             the problems behind them to the decisions that shaped the solutions.
           </p>
@@ -49,7 +49,7 @@ export default function Home() {
           >
             Experience
           </h2>
-          <p className="mt-4 max-w-xl text-ink-muted">
+          <p className="mt-4 text-ink-muted">
             The path that brought me here, newest first.
           </p>
           <div className="mt-8">

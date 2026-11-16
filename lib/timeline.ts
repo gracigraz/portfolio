@@ -41,7 +41,7 @@ export const timeline: TimelineEntry[] = [
   {
     kind: "work",
     year: "2026",
-    period: "Jun 2026 to Jul 2026",
+    period: "Mar 2026 to Aug 2026",
     title: "Software Engineer",
     org: "Alquimista",
     summary:

@@ -164,6 +164,7 @@ function EntryContent({
               <li key={project.slug}>
                 <Link
                   href={`/projects/${project.slug}`}
+                  prefetch
                   className="group inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 py-1.5 pr-3 pl-3.5 text-sm text-ink transition-colors hover:border-ink/40 hover:bg-surface"
                 >
                   {selectedProjects.includes(project) && (

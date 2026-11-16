@@ -17,11 +17,11 @@ export function ProjectCard({
 
   return (
     <article
-      className={`group relative rounded-card border border-line bg-surface p-6 transition-colors hover:border-ink/35 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-4 has-[a:focus-visible]:outline-ink sm:p-8 ${featured ? "md:grid md:grid-cols-2 md:items-center md:gap-10" : "flex flex-col"} ${className}`}
+      className={`group relative rounded-card border border-line bg-surface p-6 transition-colors hover:border-ink/35 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-4 has-[a:focus-visible]:outline-ink sm:p-7 ${featured ? "md:grid md:grid-cols-2 md:items-center md:gap-10" : "flex flex-col"} ${className}`}
     >
       {Diagram && (
         <div
-          className={`rounded-xl border border-line bg-bg bg-[radial-gradient(var(--line)_1px,transparent_1px)] [background-size:16px_16px] p-5 ${featured ? "mb-6 md:order-2 md:mb-0" : "mb-6"}`}
+          className={`rounded-xl border border-line bg-bg bg-[radial-gradient(var(--line)_1px,transparent_1px)] [background-size:16px_16px] p-4 ${featured ? "mb-6 md:order-2 md:mb-0" : "mb-5 flex items-center overflow-hidden md:h-48 md:[&_svg]:max-h-40"}`}
         >
           <Diagram />
         </div>
@@ -35,16 +35,19 @@ export function ProjectCard({
           {String(index).padStart(2, "0")} · {project.category}
         </p>
         <h3
-          className={`mt-3 font-serif leading-tight ${featured ? "text-3xl sm:text-4xl" : "text-3xl"}`}
+          className={`mt-3 font-serif leading-tight ${featured ? "text-3xl" : "text-2xl"}`}
         >
           <Link
             href={`/projects/${project.slug}`}
+            prefetch
             className="outline-none after:absolute after:inset-0 after:rounded-card"
           >
             {project.title}
           </Link>
         </h3>
-        <p className="mt-3 leading-relaxed text-ink-muted">{project.summary}</p>
+        <p className="mt-3 text-[0.95rem] leading-relaxed text-ink-muted">
+          {project.summary}
+        </p>
         <p className="mt-4 border-l-2 border-highlight pl-3 text-sm font-medium text-ink">
           <span className="sr-only">Outcome: </span>
           {project.outcome}
@@ -61,7 +64,7 @@ export function ProjectCard({
         </ul>
         <p
           aria-hidden="true"
-          className="mt-auto flex items-center gap-3 pt-6 text-sm font-medium text-ink"
+          className="mt-auto flex items-center gap-3 pt-5 text-sm font-medium text-ink"
         >
           Read case study
           <span className="flex h-9 w-9 items-center justify-center rounded-full border border-ink/20 transition-colors group-hover:border-ink group-hover:bg-ink group-hover:text-bg">

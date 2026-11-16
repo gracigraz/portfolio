@@ -70,7 +70,7 @@ export function ExternalLinks({
           <ProjectLink
             link={link}
             context={context}
-            className="inline-flex items-center gap-1.5 py-1 text-xs text-ink-muted transition-colors hover:text-ink"
+            className="inline-flex items-center gap-1.5 py-2 text-xs text-ink-muted transition-colors hover:text-ink"
             labelClassName="underline decoration-line underline-offset-4 group-hover:decoration-highlight"
           />
         </li>
