@@ -52,7 +52,7 @@ The guiding constraint: a 4 to 6 hour build where polish and clear priorities ma
 | SVG diagrams instead of screenshots | Past work is proprietary. Diagrams in the site palette explain each system at a glance | Screenshots, stock images |
 | Interactive demos instead of a skill filter | Two demos (the email allowlist and the supplier merge) let reviewers try a decision, which shows judgment better than filtering three projects | A skill filter (with three projects, there is little to filter) |
 | Native form elements styled with Tailwind | Four elements; native ones are accessible by default and need no library | shadcn/ui |
-| Hero lead sentence in Instrument Serif italic, larger, regular weight | An editorial "standfirst" that matches the headline font and stands out from the body without heavy bold | Bold sans (felt heavy); gold text (about 2.3:1 on ivory, fails contrast) |
+| Hero lead sentence in Instrument Serif italic, larger, regular weight | An editorial "standfirst" that matches the headline font and stands out from the body without heavy bold | Bold sans (felt heavy); gold text (about 2.3:1 on the background, fails contrast) |
 | Code links open GitHub in a new tab, marked with the GitHub logo; screen readers hear "on GitHub (opens in a new tab)"; `rel="noopener noreferrer"` | The logo says where the link goes without an extra arrow per link (seven ↗ marks made the rows busy); reviewers keep the portfolio open. Demos stay in the on-page player. Only the label is underlined, not the icons | Same-tab links; a ↗ after every link |
 | Intro merged into the hero ("Hi, I'm Grace." + two paragraphs beside the photos) | The top of the page does the whole introduction, so the timeline and case studies start one scroll sooner; no repeated tagline | A separate About section below the hero |
 | Two page types: one scrolling home page (hero, intro, timeline, contact) + a page per project | Fewer, fuller pages; no thin standalone About or Contact page | Separate `/about` and `/contact` pages |
@@ -79,7 +79,7 @@ The guiding constraint: a 4 to 6 hour build where polish and clear priorities ma
 | Floating "Back to top" button that appears after about 1.5 screens of scrolling | The timeline makes the page long; the button stays out of the way until it's useful. Hidden state is `inert` so keyboard users never tab into an invisible control; uses `IntersectionObserver`, not a scroll listener | A footer-only link (only helps once you reach the bottom); an always-visible button |
 | Hero mosaic: a color headshot (largest tile, cropped from a full-resolution original so it stays sharp) with five black-and-white story photos (Golden Gate, drone, wind tunnel, truck, welding) | One color photo among grayscale draws the eye to the face and keeps the set cohesive; each other photo tells part of the hardware-to-software story. Phones show four photos so the mosaic doesn't push the work down | Cropping other people out of shared photos (loses the context, like the wind tunnel); blurring faces (draws attention); screenshots with UI artifacts |
 | One warm sand block (`--surface`) behind the bottom-left of the mosaic, hidden below `lg` | Neutral and warm, so it flatters skin tones and doesn't compete with the real bamboo greens in the color headshot; reuses the card color instead of adding a token | Pale sage (two different greens fought with the bamboo); blacking out the photo background (looks heavily edited); mid-tone sage; gold; a gradient; no block |
-| "Let's talk" section in warm cream with a forest "Send message" button | Tried deep forest first: the ivory inputs on dark green outweighed the button, inverting the hierarchy. Cream matches the project cards and makes the primary action the strongest element on the section | Deep forest section (memorable, but inputs read as heavy "stickers" and the CTA got lost) |
+| "Let's talk" section in warm cream with a forest "Send message" button | Tried deep forest first: the light inputs on dark green outweighed the button, inverting the hierarchy. Cream matches the project cards and makes the primary action the strongest element on the section | Deep forest section (memorable, but inputs read as heavy "stickers" and the CTA got lost) |
 | Hero as a rectangular editorial mosaic | Same collage feel as a cut-out silhouette, but calm, and it reflows cleanly with CSS Grid | Silhouette photo collage |
 | Scope in tiers: core first (pages, form, mobile, accessibility, deploy, previews), then case-study depth and demos, then polish | Protects the polish of what matters most | Building everything at once |
 
@@ -96,10 +96,5 @@ The guiding constraint: a 4 to 6 hour build where polish and clear priorities ma
 
 ## With more time
 
-- A retry job for submissions whose email failed
-- Rate limiting and Cloudflare Turnstile
-- A custom domain with a verified sender, and an optional confirmation email with abuse protection
-- A small authenticated admin page for submissions
-- End-to-end test of the form (Playwright) and automated accessibility checks in CI
-- A dark theme
-- A skill filter and a natural-language project search: a visitor describes what they're looking for and an LLM matches it to the relevant case studies, with keyword search as a fallback
+Next steps are listed in the [walkthrough](WALKTHROUGH.md#what-i-would-build-next).
+

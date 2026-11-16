@@ -46,6 +46,31 @@ My submission for the Porter & Co take-home, Option 1: a personal portfolio.
 
 **The contact form.** It validates as you type with the same function the server uses. The API rejects oversized requests, discards bot submissions with a honeypot, and validates again. Messages are **saved before they are emailed**, so none are lost if email delivery fails. Logs contain IDs only, and the database is closed to public access.
 
+<details>
+<summary><strong>The form working end to end</strong> (screenshots from the live site)</summary>
+
+1. Invalid input is explained inline, next to each field:
+
+   ![Inline errors for an invalid email and a message under 10 characters](images/contact-validation.png)
+
+2. A valid message shows a confirmation:
+
+   ![The confirmation card after sending](images/contact-success.png)
+
+3. The message is saved in Supabase first, then marked `sent` once the email goes out:
+
+   ![The saved row in Supabase with email_status set to sent](images/contact-supabase.png)
+
+4. Resend reports it delivered:
+
+   ![The Resend log showing the email delivered](images/contact-resend.png)
+
+5. And it arrives in my inbox:
+
+   ![The notification email with the visitor's name, email, and message](images/contact-email.png)
+
+</details>
+
 **Diagrams and demos as tested code.** Diagrams are React components built from shared parts, with full text descriptions for screen readers. The demo rules are small pure functions with unit tests, so each demo shows what the real system does.
 
 **Accessibility.** Landmarks and heading order, a skip link, visible focus, full keyboard support, announced form errors, text alternatives for every diagram and image, AA contrast, and reduced-motion support. The video player uses the native `<dialog>` element, so focus and Esc work as expected.
@@ -54,11 +79,16 @@ My submission for the Porter & Co take-home, Option 1: a personal portfolio.
 
 ## What I would build next
 
-- **Help visitors find the right work:** a skill filter, and a natural-language search where a visitor describes what they're looking for and an LLM matches it to the relevant case studies, explaining the match, with keyword search as a fallback
-- Rate limiting on the contact form with a shared store such as Redis
-- A custom sending domain for the contact emails
-- End-to-end and accessibility checks in CI for the form, the video player, and every page
+- A skill filter and a natural-language project search: a visitor describes what they're looking for and an LLM matches it to the relevant case studies, explaining the match, with keyword search as a fallback
+- Rate limiting on the contact form with a shared store such as Redis, and Cloudflare Turnstile if spam appears
+- A custom sending domain for the contact emails, and an optional confirmation email with abuse protection
+- End-to-end tests (Playwright) and automated accessibility checks in CI for the form, the video player, and every page
 - Mobile-specific diagram layouts that stack vertically
 - Case studies in MDX as the writing grows
+- A retry job for submissions whose email failed
+- A small authenticated admin page for submissions
+- Zod and React Hook Form if the form grows
+- A dark theme
+- Analytics
 
 The template, libraries, and AI tools I used are listed in the [README](../README.md#templates-libraries-and-ai-tools).
