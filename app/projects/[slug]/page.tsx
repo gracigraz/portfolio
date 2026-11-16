@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { projectDemos } from "@/components/demos";
 import { projectDiagrams } from "@/components/diagrams";
-import { getProject, projects } from "@/lib/projects";
+import { getProject, projects, selectedProjects } from "@/lib/projects";
 
 export function generateStaticParams() {
   return projects.map((project) => ({ slug: project.slug }));
@@ -51,7 +51,9 @@ export default async function ProjectPage({
               aria-hidden="true"
               className="h-1.5 w-1.5 rounded-full bg-highlight"
             />
-            {String(index + 1).padStart(2, "0")} · {project.category}
+            {selectedProjects.includes(project) &&
+              `${String(selectedProjects.indexOf(project) + 1).padStart(2, "0")} · `}
+            {project.category}
           </p>
         </div>
         <h1 className="mt-6 font-serif text-5xl leading-[1.05] sm:text-6xl">

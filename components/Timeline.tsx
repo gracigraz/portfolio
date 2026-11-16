@@ -1,8 +1,9 @@
 import { ES, GB, US } from "country-flag-icons/react/3x2";
 import Link from "next/link";
-import { CodeIcon, PlayIcon } from "@/components/ExternalLinks";
+import { ProjectLink } from "@/components/ExternalLinks";
 import { SideProjects } from "@/components/SideProjects";
-import { getProject, type Project } from "@/lib/projects";
+import { periodLines } from "@/lib/period";
+import { getProject, selectedProjects, type Project } from "@/lib/projects";
 import type { Country, Degree, TimelineEntry } from "@/lib/timeline";
 
 const flags: Record<Country, typeof US> = { US, ES, GB };
@@ -13,7 +14,7 @@ export function Timeline({ entries }: { entries: TimelineEntry[] }) {
   return (
     <>
       <div className="max-w-4xl">
-        <p className="mb-10 flex gap-6 text-sm text-ink-muted md:pl-[10rem]">
+        <p className="mb-10 flex gap-6 text-sm text-ink-muted md:pl-48">
           <span className="flex items-center gap-2">
             <WorkDot /> Work
           </span>
@@ -31,9 +32,9 @@ export function Timeline({ entries }: { entries: TimelineEntry[] }) {
             return (
               <li
                 key={`${entry.title}-${entry.period}`}
-                className="relative pb-12 pl-10 before:absolute before:top-3 before:-bottom-3 before:left-[7px] before:w-px before:bg-line last:pb-0 last:before:hidden md:grid md:grid-cols-[9rem_2rem_1fr] md:pl-0 md:before:left-[10rem]"
+                className="relative pb-12 pl-10 before:absolute before:top-3 before:-bottom-3 before:left-1.75 before:w-px before:bg-line last:pb-0 last:before:hidden md:grid md:grid-cols-[11rem_2rem_1fr] md:pl-0 md:before:left-48"
               >
-                <span className="absolute top-1.5 left-0 md:left-[calc(10rem-7.5px)]">
+                <span className="absolute top-1.5 left-0 md:left-[calc(12rem-7.5px)]">
                   {entry.kind === "education" ? <EducationDot /> : <WorkDot />}
                 </span>
                 <Period
@@ -64,16 +65,29 @@ function WorkDot() {
   return (
     <span
       aria-hidden="true"
-      className="block h-[15px] w-[15px] rounded-full border-[3px] border-bg bg-ink"
+      className="block h-3.75 w-3.75 rounded-full border-[3px] border-bg bg-ink"
     />
   );
 }
 
 function EducationDot() {
   return (
-    <span aria-hidden="true" className="block h-[15px] w-[15px]">
-      <span className="block h-full w-full scale-75 rotate-45 border-2 border-bg bg-highlight" />
+    <span aria-hidden="true" className="block h-3.75 w-3.75">
+      <span className="block h-full w-full scale-[0.7] rotate-45 border-2 border-highlight bg-accent" />
     </span>
+  );
+}
+
+function OrgName({ name }: { name: string }) {
+  const match = /^(.*?) \((formerly .+)\)$/.exec(name);
+  if (!match) return name;
+  return (
+    <>
+      {match[1]}{" "}
+      <span className="font-serif text-xl font-normal text-ink-muted italic">
+        ({match[2]})
+      </span>
+    </>
   );
 }
 
@@ -92,8 +106,15 @@ function Period({
       >
         {entry.year}
       </p>
-      <p className="mt-2 text-xs tracking-wide text-ink-muted uppercase">
-        {entry.period}
+      <p className="mt-2 text-xs tracking-wide whitespace-nowrap text-ink-muted uppercase">
+        <span className="sr-only">{entry.period}</span>
+        <span aria-hidden="true">
+          {periodLines(entry.period).map((line) => (
+            <span key={line} className="block">
+              {line}
+            </span>
+          ))}
+        </span>
       </p>
     </div>
   );
@@ -112,7 +133,7 @@ function EntryContent({
   return (
     <div className="max-w-2xl">
       <h3 className="text-lg leading-snug font-medium">
-        {heading}
+        <OrgName name={heading} />
         {subheading && (
           <span className="block text-base font-normal text-ink-muted">
             {subheading}
@@ -123,33 +144,48 @@ function EntryContent({
         <p className="mt-2 leading-relaxed text-ink-muted">
           {entry.summary}
           {entry.links?.map((link) => (
-            <a
+            <ProjectLink
               key={link.href}
-              href={link.href}
-              className="ml-2 inline-flex items-center gap-1.5 text-sm whitespace-nowrap text-ink underline decoration-highlight decoration-2 underline-offset-4 hover:decoration-ink"
-            >
-              {link.kind === "video" ? <PlayIcon /> : <CodeIcon />}
-              {link.label}
-              <span className="sr-only"> for {entry.org ?? entry.title}</span>
-            </a>
+              link={link}
+              context={entry.org ?? entry.title}
+              className="ml-2 inline-flex items-center gap-1.5 text-sm whitespace-nowrap text-ink-muted transition-colors hover:text-ink"
+              labelClassName="underline decoration-line underline-offset-4 group-hover:decoration-highlight"
+            />
           ))}
         </p>
       )}
       {projects.length > 0 && (
-        <p className="mt-3 text-sm text-ink-muted">
-          Case studies:{" "}
-          {projects.map((project, i) => (
-            <span key={project.slug}>
-              {i > 0 && " · "}
-              <Link
-                href={`/projects/${project.slug}`}
-                className="text-ink underline decoration-highlight decoration-2 underline-offset-4"
-              >
-                {project.shortTitle}
-              </Link>
-            </span>
-          ))}
-        </p>
+        <div className="mt-4">
+          <h4 className="text-xs tracking-wide text-ink-muted uppercase">
+            Case studies
+          </h4>
+          <ul className="mt-2 flex flex-wrap gap-2">
+            {projects.map((project) => (
+              <li key={project.slug}>
+                <Link
+                  href={`/projects/${project.slug}`}
+                  className="group inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 py-1.5 pr-3 pl-3.5 text-sm text-ink transition-colors hover:border-ink/40 hover:bg-surface"
+                >
+                  {selectedProjects.includes(project) && (
+                    <span className="font-serif text-base leading-none text-ink-muted italic">
+                      {String(selectedProjects.indexOf(project) + 1).padStart(
+                        2,
+                        "0",
+                      )}
+                    </span>
+                  )}
+                  {project.shortTitle}
+                  <span
+                    aria-hidden="true"
+                    className="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none"
+                  >
+                    →
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
       {!entry.foundation && entry.degrees && (
         <ul className="mt-4 space-y-3">
@@ -170,7 +206,7 @@ function DegreeRow({ degree }: { degree: Degree }) {
     <li className="flex gap-3 rounded-card border border-line bg-surface/60 p-4">
       <Flag
         aria-hidden="true"
-        className="mt-1 h-4 w-6 shrink-0 rounded-[2px] ring-1 ring-line"
+        className="mt-1 h-4 w-6 shrink-0 rounded-xs ring-1 ring-line"
       />
       <div className="space-y-1">
         {degree.credentials.map((credential) => (
@@ -201,7 +237,7 @@ function DegreeCard({ degree }: { degree: Degree }) {
       <p className="flex items-center gap-2 text-xs tracking-wide text-ink-muted uppercase">
         <Flag
           aria-hidden="true"
-          className="h-4 w-6 rounded-[2px] ring-1 ring-line"
+          className="h-4 w-6 rounded-xs ring-1 ring-line"
         />
         {years.join(", ")}
       </p>

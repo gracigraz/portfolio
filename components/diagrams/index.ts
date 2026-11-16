@@ -1,10 +1,12 @@
 import type { ComponentType } from "react";
+import { AttributionFlow } from "@/components/diagrams/AttributionFlow";
 import { MergeFlow } from "@/components/diagrams/MergeFlow";
 import { RenewalFlow } from "@/components/diagrams/RenewalFlow";
-import { ZipFunnel } from "@/components/diagrams/ZipFunnel";
+import { ThreadsFlow } from "@/components/diagrams/ThreadsFlow";
 
 export const projectDiagrams: Record<string, ComponentType> = {
+  "content-attribution": AttributionFlow,
   "ai-agent-renewals": RenewalFlow,
   "internal-admin-portal": MergeFlow,
-  "zip-sync-investigation": ZipFunnel,
+  "chat-threads": ThreadsFlow,
 };

@@ -2,7 +2,7 @@ import { ContactForm } from "@/components/ContactForm";
 import { Hero } from "@/components/Hero";
 import { ProjectCard } from "@/components/ProjectCard";
 import { Timeline } from "@/components/Timeline";
-import { projects } from "@/lib/projects";
+import { selectedProjects } from "@/lib/projects";
 import { timeline } from "@/lib/timeline";
 
 export default function Home() {
@@ -15,15 +15,16 @@ export default function Home() {
         aria-labelledby="work-heading"
         className="scroll-mt-8 border-t border-line"
       >
-        <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-8">
+        <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-8">
           <h2 id="work-heading" className="font-serif text-5xl sm:text-6xl">
             Selected work
           </h2>
           <p className="mt-4 max-w-xl text-ink-muted">
-            Three case studies from my most recent role at Rivio AI.
+            A closer look at three projects from Alquimista and Rivio AI, from
+            the problems behind them to the decisions that shaped the solutions.
           </p>
           <div className="mt-12 grid gap-6 md:grid-cols-2">
-            {projects.map((project, i) => (
+            {selectedProjects.map((project, i) => (
               <ProjectCard
                 key={project.slug}
                 project={project}
@@ -41,7 +42,7 @@ export default function Home() {
         aria-labelledby="experience-heading"
         className="scroll-mt-8 border-t border-line"
       >
-        <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-8">
+        <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-8">
           <h2
             id="experience-heading"
             className="font-serif text-5xl sm:text-6xl"
@@ -49,7 +50,7 @@ export default function Home() {
             Experience
           </h2>
           <p className="mt-4 max-w-xl text-ink-muted">
-            The path that led there, newest first.
+            The path that brought me here, newest first.
           </p>
           <div className="mt-8">
             <Timeline entries={timeline} />
@@ -62,7 +63,7 @@ export default function Home() {
         aria-labelledby="contact-heading"
         className="scroll-mt-8 border-t border-line bg-surface"
       >
-        <div className="mx-auto grid w-full max-w-6xl gap-12 px-4 py-20 sm:px-8 md:grid-cols-[2fr_3fr] md:gap-16">
+        <div className="mx-auto grid w-full max-w-6xl gap-12 px-4 py-16 sm:px-8 md:grid-cols-[2fr_3fr] md:gap-16">
           <div>
             <h2
               id="contact-heading"
@@ -71,8 +72,8 @@ export default function Home() {
               Let&apos;s talk
             </h2>
             <p className="mt-4 max-w-md text-lg text-ink-muted">
-              Building something, hiring, or just curious about a project? Send
-              me a note and I&apos;ll get back to you.
+              Have a role, project, or question in mind? I’d love to hear from
+              you.
             </p>
           </div>
           <ContactForm />

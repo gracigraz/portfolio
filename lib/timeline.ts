@@ -40,16 +40,26 @@ export type TimelineEntry = {
 export const timeline: TimelineEntry[] = [
   {
     kind: "work",
+    year: "2026",
+    period: "Jun 2026 to Jul 2026",
+    title: "Software Engineer",
+    org: "Alquimista",
+    summary:
+      "Built an attribution product end to end for a course creator: it traces each sale back to the YouTube video, email, or post that drove it.",
+    projectSlugs: ["content-attribution"],
+  },
+  {
+    kind: "work",
     year: "2024",
     period: "Sep 2024 to Jun 2026",
     title: "Software Engineer",
     org: "Rivio AI",
     summary:
-      "AI procurement software. I owned the product's Next.js frontend, worked on the team's AI agent, built the internal admin portal, and connected the product to the systems customers already used.",
+      "Worked across the stack at an AI procurement startup. I owned the Next.js frontend, built AI-agent workflows and internal tools, and contributed to the Python services and integrations connecting the product to customers’ existing systems.",
     projectSlugs: [
       "ai-agent-renewals",
       "internal-admin-portal",
-      "zip-sync-investigation",
+      "chat-threads",
     ],
   },
   {
@@ -59,7 +69,7 @@ export const timeline: TimelineEntry[] = [
     title: "Software Engineer",
     org: "Ultralight (formerly Vibrant Practice)",
     summary:
-      "Authentication and clinician-facing interfaces for an EHR platform built on Medplum and FHIR.",
+      "Built authentication flows and clinician-facing interfaces for an EHR platform using Medplum and FHIR.",
   },
   {
     kind: "work",
@@ -68,10 +78,10 @@ export const timeline: TimelineEntry[] = [
     title: "React Native Engineer",
     org: "Try Reeve",
     summary:
-      "An iOS app in React Native, Expo, and TypeScript for recording audio and playing back memories.",
+      "Built an iOS app with React Native, Expo, and TypeScript that lets people record audio and revisit personal memories.",
     links: [
       {
-        label: "Watch demo",
+        label: "Demo",
         href: "https://www.loom.com/share/7a3cf3e80de4429a8e287f6e36026141",
         kind: "video",
       },
@@ -84,10 +94,10 @@ export const timeline: TimelineEntry[] = [
     title: "Full Stack Developer",
     org: "Make it MVP",
     summary:
-      "An AI group-chat app with React, Firestore, and the OpenAI API. Named MVP of the team.",
+      "Built an AI-powered group chat app with React, Firestore, and the OpenAI API. Named team MVP.",
     links: [
       {
-        label: "Watch demo",
+        label: "Demo",
         href: "https://www.loom.com/share/4f71c508ea4145988a3921b8c928c2e3",
         kind: "video",
       },
@@ -203,7 +213,7 @@ export const timeline: TimelineEntry[] = [
     title: "Manufacturing Engineer, then Senior",
     org: "Wisk (formerly Kitty Hawk)",
     summary:
-      "Production tooling and shop-floor workflows for the Cora autonomous aircraft.",
+      "Developed production tooling and shop-floor workflows for the Cora autonomous aircraft.",
   },
   {
     kind: "work",
@@ -213,7 +223,7 @@ export const timeline: TimelineEntry[] = [
     org: "C&H Enterprises, Ibérica del Espacio",
     grouped: true,
     summary:
-      "New product introduction, and thermal control panels for satellites built for NASA, ESA, and JAXA.",
+      "Worked on new product introduction and thermal-control panels for satellites built for NASA, ESA, and JAXA.",
   },
   {
     kind: "work",

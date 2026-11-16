@@ -1,25 +1,51 @@
+import { GitHubIcon, PlayIcon } from "@/components/icons";
+import { VideoLink } from "@/components/VideoLink";
 import type { ExternalLink } from "@/lib/timeline";
 
-export function CodeIcon() {
-  return (
-    <svg viewBox="0 0 16 16" aria-hidden="true" className="h-3.5 w-3.5">
-      <path
-        d="M5.5 4 2 8l3.5 4M10.5 4 14 8l-3.5 4"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
+export function ProjectLink({
+  link,
+  context,
+  className,
+  labelClassName,
+}: {
+  link: ExternalLink;
+  context: string;
+  className: string;
+  labelClassName: string;
+}) {
+  if (link.kind === "video") {
+    return (
+      <VideoLink
+        href={link.href}
+        title={context}
+        className={`group ${className}`}
+      >
+        <span
+          aria-hidden="true"
+          className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-ink/25 text-ink transition-colors group-hover:border-ink group-hover:bg-ink group-hover:text-bg"
+        >
+          <PlayIcon className="ml-px h-2 w-2" />
+        </span>
+        <span className={labelClassName}>{link.label}</span>
+        <span className="sr-only"> for {context}</span>
+      </VideoLink>
+    );
+  }
 
-export function PlayIcon() {
   return (
-    <svg viewBox="0 0 16 16" aria-hidden="true" className="h-3 w-3">
-      <path d="M4.5 2.5v11l9-5.5z" fill="currentColor" />
-    </svg>
+    <a
+      href={link.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`group ${className}`}
+    >
+      <GitHubIcon className="h-3.5 w-3.5" />
+      <span className={labelClassName}>{link.label}</span>
+      <span className="sr-only">
+        {" "}
+        for {context} on GitHub (opens in a new tab)
+      </span>
+    </a>
   );
 }
 
@@ -41,14 +67,12 @@ export function ExternalLinks({
               ·
             </span>
           )}
-          <a
-            href={link.href}
-            className="inline-flex items-center gap-1.5 py-1 text-xs text-ink-muted underline decoration-line underline-offset-4 transition-colors hover:text-ink hover:decoration-highlight"
-          >
-            {link.kind === "video" ? <PlayIcon /> : <CodeIcon />}
-            {link.label}
-            <span className="sr-only"> for {context}</span>
-          </a>
+          <ProjectLink
+            link={link}
+            context={context}
+            className="inline-flex items-center gap-1.5 py-1 text-xs text-ink-muted transition-colors hover:text-ink"
+            labelClassName="underline decoration-line underline-offset-4 group-hover:decoration-highlight"
+          />
         </li>
       ))}
     </ul>

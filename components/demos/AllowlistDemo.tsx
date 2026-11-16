@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { BlockedIcon, CheckIcon } from "@/components/icons";
 import { checkRecipient, type RecipientCheck } from "@/lib/allowlist";
 
 const ALLOWED_DOMAINS = ["northwind.example", "ops.example"] as const;
@@ -143,7 +144,10 @@ function Result({ result }: { result: RecipientCheck }) {
   if (result.status === "sent") {
     return (
       <div className="rounded-xl bg-accent/60 px-4 py-3 text-sm text-ink">
-        <p className="font-medium">✓ Sent to {result.domain}</p>
+        <p className="flex items-center gap-2 font-medium">
+          <CheckIcon />
+          Sent to {result.domain}
+        </p>
         <p className="mt-1">The domain is on this customer&apos;s allowlist.</p>
       </div>
     );
@@ -151,8 +155,9 @@ function Result({ result }: { result: RecipientCheck }) {
 
   return (
     <div className="rounded-xl bg-highlight/60 px-4 py-3 text-sm text-ink">
-      <p className="font-medium">
-        ⚠ Blocked: {result.domain} is not on the allowlist
+      <p className="flex items-center gap-2 font-medium">
+        <BlockedIcon className="h-4 w-4 shrink-0" />
+        Blocked: {result.domain} is not on the allowlist
       </p>
       <p className="mt-1">
         The task holds at draft ready and escalates to a person inside the

@@ -45,6 +45,10 @@ export function ProjectCard({
           </Link>
         </h3>
         <p className="mt-3 leading-relaxed text-ink-muted">{project.summary}</p>
+        <p className="mt-4 border-l-2 border-highlight pl-3 text-sm font-medium text-ink">
+          <span className="sr-only">Outcome: </span>
+          {project.outcome}
+        </p>
         <ul className="mt-5 flex flex-wrap gap-2" aria-label="Skills">
           {project.skills.map((skill) => (
             <li

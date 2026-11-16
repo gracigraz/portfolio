@@ -71,7 +71,7 @@ No separate `/about` or `/contact` pages. Header nav: Work `/#work`, Experience 
 - Company first (`font-medium`), role below in muted text: the company is what people scan for
 - The final education entry is a "foundation": the line ends at its diamond and the three degrees sit below as a row of three cards spanning the full section width (wider than the timeline column, so long degree names don't cramp). Text flows top-down: flag + years, degree, school and city, note; stacked on mobile
 - Groups use one soft surface (`bg-surface/60` + border) instead of separate hollow boxes (the earlier-projects list, the degree cards). BrainStation credentials are a single text line; its bootcamp projects are collapsed by default
-- **Work vs. education:** work entries get a solid forest dot; education entries a gold diamond and an italic year; a legend above the timeline explains both
+- **Work vs. education:** work entries get a solid forest dot; education entries a sage diamond with a gold border and an italic year (gold is reserved for highlights); a legend above the timeline explains both
 - **Degrees:** education entries list each credential as a small bordered card with an SVG country flag (`country-flag-icons/react/3x2`, `aria-hidden`; the place is in the text)
 - Data in `lib/timeline.ts`, typed; project cards reference `lib/projects.ts` by slug
 
@@ -101,8 +101,10 @@ components/
   Timeline.tsx            the work/education timeline (server component)
   ProjectCard.tsx         case-study card shown on the timeline
   SideProjects.tsx        "use client"; collapsible list of earlier projects
-  ExternalLinks.tsx       quiet inline code / demo links with icons, separated by dots
+  ExternalLinks.tsx       ProjectLink (GitHub link in a new tab, or demo video player) and the dot-separated list
+  icons.tsx               shared GitHub and play icons
   BackToTop.tsx           "use client"; floating back-to-top button
+  VideoLink.tsx           "use client"; demo link that opens the Loom video in a native <dialog> (falls back to a normal link)
   diagrams/               one SVG diagram per project + index.ts mapping slug to diagram
   Header.tsx, Footer.tsx  Footer is a cached component (see section 6)
 supabase/
@@ -115,6 +117,8 @@ lib/
   validateContact.ts      shared validation, used by client AND server
   validateContact.test.ts
   allowlist.ts            checkRecipient(): exact-domain allowlist check used by the demo
+  video.ts                loomEmbedUrl(): turns a Loom share link into an embed link (strict match)
+  video.test.ts
   allowlist.test.ts
 ```
 
@@ -156,7 +160,8 @@ export type Skill = "TypeScript" | "React" | "Next.js" | "Python" | "AWS" | "LLM
 The past projects are proprietary, so there are no screenshots to show. Instead, each project gets a simple SVG diagram in the site palette (ivory, forest, sage), drawn as a React component:
 - Renewal workflow: the three guardrail layers, or the task lifecycle
 - Admin tool: the three-phase merge flow
-- Zip investigation: the filter funnel (vendors in → buckets out)
+- Content attribution: the source carried from video to sale by a cookie
+- Chat threads: each message written to the unchanged history and to a new thread index
 
 These look intentional and editorial, explain the work at a glance, and don't depend on finding images. Hero photos use placeholders until real ones are added.
 
@@ -341,7 +346,6 @@ Checked against the docs bundled in `node_modules/next/dist/docs/`.
 | `--ink-muted` | `#4F5D4A` deep olive | secondary text, captions | yes, ~6.7:1 |
 | `--surface` | `#E8E1D5` warm cream | section bands, cards | n/a |
 | `--accent` | `#9FBA96` sage green | hero corner block, diagram fills (at 60% opacity so labels stay above 4.5:1), dividers | **no** (~2:1), never for text |
-| `--accent-soft` | `#CFDFC8` pale sage | the large hero backdrop only: lighter than the photos so it sits behind them | n/a (decorative) |
 | `--highlight` | `#C8A96B` muted gold | tiny details (active-filter dot, underline) | **no**, decoration only |
 | `--line` | `#D6D3C8` stone | borders, input outlines | n/a |
 - Dark theme (stretch) = the same variables redefined under `[data-theme="dark"]`, so no component changes

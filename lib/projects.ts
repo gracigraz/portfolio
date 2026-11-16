@@ -6,7 +6,8 @@ export type Skill =
   | "AWS"
   | "LLM agents"
   | "Neo4j"
-  | "Root-cause analysis";
+  | "Supabase"
+  | "Edge functions";
 
 export type Decision = { title: string; detail: string };
 
@@ -27,6 +28,52 @@ export type Project = {
 };
 
 export const projects: Project[] = [
+  {
+    slug: "content-attribution",
+    title: "Which video made the sale?",
+    shortTitle: "Content attribution",
+    category: "Attribution",
+    summary:
+      "Built an attribution product end to end that traces each sale back to the YouTube video, email, or post that drove it: tracked links, a tracking script, an edge ingest API, and a revenue dashboard.",
+    skills: ["Next.js", "TypeScript", "Supabase", "Edge functions"],
+    role: "Sole engineer: product, data model, tracking, API, and dashboard",
+    period: "Jun to Jul 2026",
+    outcome: "The creator can see which videos drive sales",
+    problem: [
+      "A course creator publishes YouTube videos, emails, and community posts that all point to the same sales page. Sales were coming in, but there was no way to tell which piece of content had earned them, so there was no way to know where to put the effort.",
+      "The hard part is the gap between the click and the purchase. People often buy days after they first click, on a different page (the thank-you page after checkout), and the checkout itself runs on a third-party platform.",
+    ],
+    myRole: [
+      "The creator had the idea and the need; I designed and built the product end to end around it: the data model, the tracking script that runs on his pages, the ingest API, tracked-link generation, offers and funnel steps, and the dashboard, in Spanish for a Spanish-speaking audience.",
+      "I wrote the design doc first, recording the stack decisions as ADRs, and an onboarding guide for proving tracking works before trusting the numbers.",
+    ],
+    decisions: [
+      {
+        title: "A cookie carries the source from first click to purchase",
+        detail:
+          "Every tracked link carries a short source key (`?src=`). The tracking script saves it in a first-party cookie for 30 days, so when the sale fires on the thank-you page days later, it reads the same source. That works on any checkout platform without integrating with it.",
+      },
+      {
+        title: "Split the source into an ID and a type",
+        detail:
+          "YouTube videos have a URL, so their key is the video ID. Emails and posts don’t, so the creator names them and the app mints a key from the name plus a short random suffix, so two campaigns with the same subject never collide. The key is stored, not re-derived from a URL on every read, which had broken for sources without a URL.",
+      },
+      {
+        title: "Revenue comes from the server, not the browser",
+        detail:
+          "Sale events don’t carry a price the browser could fake. The server looks up the offer’s price, one extra read only on sales, never on page views. It’s accurate for fixed-price products, the common case. Exact totals with discounts would need payment webhooks, deferred until pricing actually varies.",
+      },
+      {
+        title: "A fast, defensive ingest endpoint",
+        detail:
+          "Events arrive on an Edge route for low latency. It rejects unknown tracking IDs, rate-limits with Redis over HTTP (Edge can’t open raw connections), and drops bot traffic. The bot filter was tuned against real data: a headless renderer on the creator’s page platform was inflating page views, and it leans toward keeping a real visitor over dropping one.",
+      },
+    ],
+    results: [
+      "For the first time, the creator can see which videos drive sales, and he uses it as its first user.",
+      "I also designed the next step: safely inserting tracked links into existing video descriptions, with snapshots and a revert path before any live edit.",
+    ],
+  },
   {
     slug: "ai-agent-renewals",
     title: "Contract renewals for an AI agent",
@@ -50,7 +97,7 @@ export const projects: Project[] = [
       {
         title: "The hard rule lives in code, not in the prompt",
         detail:
-          "Per-customer instructions in the prompt are a request, not a guarantee: a model can misread them, and an email can try to talk it into something else. The model only ever requests a send; the code that executes it checks the recipient's domain against a per-customer allowlist first. Unlisted domains are blocked and the task stops at draft ready. When no allowlist is set, nothing changes, so other customers weren't affected.",
+          "Per-customer instructions in the prompt are a request, not a guarantee: a model can misread them, and an email can try to talk it into something else. The model only ever requests a send; the code that executes it checks the recipient’s domain against a per-customer allowlist first. Unlisted domains are blocked and the task stops at draft ready. When no allowlist is set, nothing changes, so other customers weren’t affected.",
       },
       {
         title: "One agent with branched instructions, not a new agent",
@@ -60,11 +107,11 @@ export const projects: Project[] = [
       {
         title: "A UI driven by data, not by task type",
         detail:
-          "The UI never branches on the task type. A contract card appears when contract fields exist; a due date appears when there's a renewal date. That let the UI ship before the backend fields did, and a future task type works with no frontend changes.",
+          "The UI never branches on the task type. A contract card appears when contract fields exist; a due date appears when there’s a renewal date. That let the UI ship before the backend fields did, and a future task type works with no frontend changes.",
       },
     ],
     results: [
-      "The customer's rule became enforceable in code instead of a hope in a prompt, and it was backward compatible for everyone else.",
+      "The customer’s rule became enforceable in code instead of a hope in a prompt, and it was backward compatible for everyone else.",
       "The agent changes and the UI shipped the same day, on the plan the design doc laid out.",
       "In the first days after release I found and fixed two silent failures: renewal tasks were loading the generic instructions (the task type was read from the wrong place), and renewal emails went out as plain text (shared formatting rules were missing from the renewal branch).",
     ],
@@ -82,7 +129,7 @@ export const projects: Project[] = [
     outcome: "Data fixes without filing tickets",
     problem: [
       "Customer data in our graph came from several sources: contract-system syncs, manual additions, and document uploads. Duplicates and mistakes were inevitable, and every correction meant asking an engineer.",
-      "The people closest to the customers needed to look up and fix data themselves, across environments, without the risk of breaking something they couldn't see.",
+      "The people closest to the customers needed to look up and fix data themselves, across environments, without the risk of breaking something they couldn’t see.",
     ],
     myRole: [
       "I built the internal admin portal end to end: the Next.js frontend and the Python API behind it on AWS, including lookups and edits across environments, previews before destructive actions, and the duplicate-merge tooling.",
@@ -110,46 +157,52 @@ export const projects: Project[] = [
     ],
   },
   {
-    slug: "zip-sync-investigation",
-    title: "Finding the contracts that never arrived",
-    shortTitle: "Zip sync audit",
-    category: "Production investigation",
+    slug: "chat-threads",
+    title: "From one chat to many threads",
+    shortTitle: "Chat threads",
+    category: "Data modeling",
     summary:
-      "A 215-vendor audit traced missing contracts to configuration and filter behavior, not bugs. The fix: per-customer sync settings, support beyond PDFs, and a runbook anyone could follow.",
-    skills: ["Root-cause analysis", "Python", "AWS"],
-    role: "Led the investigation and the fix",
-    period: "May 2026",
-    outcome: "About 2,000 more documents synced",
+      "Designed and shipped multiple conversations for our AI assistant: a new thread index alongside the untouched message history, backward compatibility for every existing chat, a backfill, and the sidebar UI.",
+    skills: ["Python", "AWS", "TypeScript", "Next.js"],
+    role: "Design doc author; backend and frontend",
+    period: "Dec 2025 to Feb 2026",
+    outcome: "Users can keep and return to many conversations",
     problem: [
-      "A customer reported that vendors they could see in their contract system weren't showing up in our product. The sync job wasn't erroring, so the question was whether it was broken or doing exactly what it was told.",
+      "Our AI assistant stored every message in one table keyed by chat ID, and a user’s general chat ID was simply their user ID. So each person had a single general conversation: starting a new chat overwrote the old one.",
+      "There was also nowhere to keep a title or per-chat instructions, no way to scope a chat to several products, and listing a user’s chats would have meant scanning millions of messages.",
     ],
     myRole: [
-      "I audited all 215 vendors the customer listed, traced each one through the sync's filter chain, found the real causes, shipped the fix, and turned the investigation into a runbook the team could reuse.",
+      "I wrote the design doc and built both sides: on the backend, the thread service, the new endpoints, API tests, and a backfill script; in the product, the thread sidebar with search, grouping by product, editable titles, and resuming a conversation.",
     ],
     decisions: [
       {
-        title: "Classify every vendor before changing anything",
+        title: "A new thread index instead of changing the message table",
         detail:
-          "Each vendor landed in exactly one bucket: already synced, outside the date window, excluded attachment type, no file attached, or no agreement. 146 of the 147 that should have synced were verified in the graph. The missing ones were the filters working as configured, not a bug.",
+          "The message table stays exactly as it was. A new table, keyed by user, holds one row per thread: title, preview, last activity, scope, and linked products. It costs one extra write per message, and in exchange there is no schema change and no risk to the messages already in production.",
       },
       {
-        title: "The real recency gate was the date window",
+        title: "Rejecting the index that looked simpler",
         detail:
-          "A contract's status stays active even after it expires, so the end-date window, not the status, was deciding what synced. That's what made recent-looking contracts disappear.",
+          "A secondary index on the message table would have allowed querying by user, but titles and instructions would still need a home, every existing message would need a user ID backfilled, and the index returns messages rather than threads, so the client would have to deduplicate them. We would have ended up with two tables anyway, plus the complexity.",
       },
       {
-        title: "Fix it in configuration, not code",
+        title: "Every existing chat keeps working",
         detail:
-          "I added per-customer settings for the date window, extra attachment types, and syncing uncategorized contracts, with defensive normalization so a typo can't accidentally disable a filter. I also widened file support beyond PDFs to Office documents and images.",
+          "The owner and scope of a thread are inferred from the existing chat ID formats: web users, product chats, and Slack channels, threads, and DMs. New threads get IDs generated by the backend, and a backfill script with a dry run brings existing conversations into the new list.",
       },
     ],
     results: [
-      "About 2,000 additional documents synced after the change.",
-      "56 new unit tests and three production dry runs before enabling it.",
-      "A step-by-step runbook so the next missing-data report doesn't need me.",
+      "Users can run many conversations with the assistant, scoped to one or several products, and come back to them from the sidebar.",
+      "Shipped without changing the existing message table, with API tests covering the new endpoints.",
     ],
   },
 ];
+
+// The projects shown in "Selected work", in order. Others keep their pages
+// and stay linked from the timeline.
+export const selectedProjects = projects.filter(
+  (project) => project.slug !== "chat-threads",
+);
 
 export function getProject(slug: string) {
   return projects.find((project) => project.slug === slug);

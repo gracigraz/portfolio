@@ -6,7 +6,6 @@
   --ink-muted: #4f5d4a;
   --surface: #e8e1d5;
   --accent: #9fba96;
-  --accent-soft: #cfdfc8;
   --highlight: #c8a96b;
   --line: #d6d3c8;
 }
@@ -17,7 +16,6 @@
   --color-ink-muted: var(--ink-muted);
   --color-surface: var(--surface);
   --color-accent: var(--accent);
-  --color-accent-soft: var(--accent-soft);
   --color-highlight: var(--highlight);
   --color-line: var(--line);
   --font-sans: var(--font-inter);
@@ -34,6 +32,10 @@
   :focus-visible {
     outline: 2px solid var(--ink);
     outline-offset: 3px;
+  }
+
+  html:has(dialog[open]) {
+    overflow: hidden;
   }
 
   input:-webkit-autofill,

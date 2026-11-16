@@ -40,11 +40,11 @@ export function SideProjects({ projects }: { projects: SideProject[] }) {
         className={`grid transition-[grid-template-rows] duration-300 ease-out ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
       >
         <div className="overflow-hidden">
-          <ul className="mt-2 divide-y divide-line rounded-card border border-line bg-surface/60 px-4">
+          <ul className="mt-1 space-y-1">
             {projects.map((project) => (
               <li
                 key={project.name}
-                className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-3"
+                className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-1.5"
               >
                 <p className="text-sm">
                   <span className="font-medium">{project.name}</span>
