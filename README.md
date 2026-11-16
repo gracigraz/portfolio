@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Graciela Manzanares · Portfolio
 
-## Getting Started
+My personal portfolio: an introduction, three case studies on my role, decisions, and results, and a working contact form.
 
-First, run the development server:
+- **Live site:** https://gracielamsousa.vercel.app
+- **Walkthrough:** **[docs/WALKTHROUGH.md](docs/WALKTHROUGH.md)**, my design decisions, technical choices, and next steps
+
+## Quick tour
+
+- **[Which video made the sale?](https://gracielamsousa.vercel.app/projects/content-attribution)** is an attribution product I built end to end.
+- **[Contract renewals for an AI agent](https://gracielamsousa.vercel.app/projects/ai-agent-renewals)** includes an interactive demo of a guardrail enforced in code.
+- **[An admin platform](https://gracielamsousa.vercel.app/projects/internal-admin-portal)** includes an interactive demo of merging duplicate records.
+- **[Contact](https://gracielamsousa.vercel.app/#contact):** messages are saved to a database and emailed to me.
+
+## Stack
+
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Supabase · Resend · Vitest · Vercel
+
+## Running locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # then fill in the values
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Variable | Purpose |
+| --- | --- |
+| `SUPABASE_URL` | Supabase project URL |
+| `SUPABASE_SECRET_KEY` | Server-only secret key (`sb_secret_…`) |
+| `RESEND_API_KEY` | Resend API key with sending access |
+| `CONTACT_TO_EMAIL` | Where contact messages are delivered |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Run `supabase/schema.sql` once in the Supabase SQL editor to create the contact table.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Production build |
+| `npm test` | Unit tests (Vitest) |
+| `npm run lint` | ESLint |
 
-To learn more about Next.js, take a look at the following resources:
+## Project structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/          pages, the contact API route, generated OG image, favicon, sitemap
+components/   page sections, diagrams, and interactive demos
+lib/          typed content and tested logic; lib/server holds server-only code
+docs/         walkthrough, decision log, and technical design
+supabase/     database schema
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Templates, libraries, and AI tools
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Template:** the `create-next-app` starter only. The design is my own.
+- **Libraries:** Next.js, React, Tailwind CSS, `@supabase/supabase-js`, `resend`, `server-only`, `country-flag-icons`, and Vitest. Fonts: Inter and Instrument Serif via `next/font`. Instrument Serif is also bundled in `assets/` for the generated images, under the SIL Open Font License.
+- **AI tools:** Claude Code as a pair programmer, for implementation, code review against accessibility and security practices, checking case-study details against the original repositories, and editing the writing. The product and design decisions are mine, and I reviewed and tested every change.

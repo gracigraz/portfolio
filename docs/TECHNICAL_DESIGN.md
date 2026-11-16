@@ -1,7 +1,6 @@
 # Portfolio Site: Technical Design
 
-Companion to [DECISIONS.md](DECISIONS.md) (the why). This doc is the what: how the site is built.
-Last updated: 2026-11-13
+Companion to [DECISIONS.md](DECISIONS.md) (the why). This is the technical design I wrote before building. The site as shipped is summarized in the [walkthrough](WALKTHROUGH.md) and the [README](../README.md).
 
 ---
 
@@ -146,7 +145,7 @@ export type Skill = "TypeScript" | "React" | "Next.js" | "Python" | "AWS" | "LLM
 // A union type, so a typo in a tag is a compile error and filter chips can't drift from the data.
 ```
 
-### 4.1 Skill filter
+### 4.1 Skill filter (planned; replaced by the interactive demos)
 
 - Chips generated from the distinct skills across projects (sorted by how many projects use each)
 - Click a chip → state `activeSkill`; matching cards stay full, others dim (opacity, not hidden, so layout doesn't jump)
@@ -157,13 +156,13 @@ export type Skill = "TypeScript" | "React" | "Next.js" | "Python" | "AWS" | "LLM
 
 ### 4.3 Project visuals
 
-The past projects are proprietary, so there are no screenshots to show. Instead, each project gets a simple SVG diagram in the site palette (ivory, forest, sage), drawn as a React component:
-- Renewal workflow: the three guardrail layers, or the task lifecycle
-- Admin tool: the three-phase merge flow
+Most of this work is proprietary, so instead of screenshots each project gets an SVG diagram in the site palette (ivory, forest, sage), drawn as a React component:
+- Renewal workflow: the status machine (with the escalation loop and where the allowlist check runs); a smaller DocuSign signing flow sits inside its deep-dive section
+- Admin platform: the architecture (UI → API → data); a smaller merge-steps diagram sits inside its deep-dive section (`deepDiveDiagrams`)
 - Content attribution: the source carried from video to sale by a cookie
 - Chat threads: each message written to the unchanged history and to a new thread index
 
-These look intentional and editorial, explain the work at a glance, and don't depend on finding images. Hero photos use placeholders until real ones are added.
+These look intentional and editorial, explain the work at a glance, and don't depend on finding images.
 
 ### 4.2 Next / previous
 
@@ -217,7 +216,7 @@ idle ──submit──► (client validation fails) ──► invalid (field er
 | invalid | message under each bad field, focus moves to the first one | `aria-invalid="true"`, `aria-describedby` → error text |
 | submitting | button disabled, label "Sending..." | `aria-busy="true"` on form; button stays focusable text |
 | success | form replaced by a thank-you card: "Thanks, {name}. I'll reply within 2 days." plus a "Send another message" button that resets the form | card is `<div ref={successRef} tabIndex={-1} role="status">` and focus is moved to it explicitly (`successRef.current?.focus()`). Relying only on a newly mounted `aria-live` region often isn't announced, and unmounting the form would otherwise drop focus to `<body>` |
-| error | form keeps typed text; "Something went wrong. Please try again, or message me on LinkedIn." (link) | `role="alert"`. LinkedIn instead of an email address, so no address is published on the site |
+| error | form keeps typed text; "Message not sent. Please try again, or message me on LinkedIn." (link) | `role="alert"`. LinkedIn instead of an email address, so no address is published on the site |
 
 Never clear what the user typed on error.
 
@@ -341,10 +340,10 @@ Checked against the docs bundled in `node_modules/next/dist/docs/`.
 
 | Token | Hex | Use | Text-safe on `--bg`? |
 |---|---|---|---|
-| `--bg` | `#FAF9F4` ivory | page background | n/a |
+| `--bg` | `#FBF7F0` warm cream | page background | n/a |
 | `--ink` | `#0F5132` forest | headings, body text, primary buttons | yes, ~8.9:1 |
-| `--ink-muted` | `#4F5D4A` deep olive | secondary text, captions | yes, ~6.7:1 |
-| `--surface` | `#E8E1D5` warm cream | section bands, cards | n/a |
+| `--ink-muted` | `#5C564E` warm gray | secondary text, captions | yes, ~6.8:1 |
+| `--surface` | `#ECE3D3` warm sand | section bands, cards, the hero block | muted text ~5.7:1 |
 | `--accent` | `#9FBA96` sage green | hero corner block, diagram fills (at 60% opacity so labels stay above 4.5:1), dividers | **no** (~2:1), never for text |
 | `--highlight` | `#C8A96B` muted gold | tiny details (active-filter dot, underline) | **no**, decoration only |
 | `--line` | `#D6D3C8` stone | borders, input outlines | n/a |
