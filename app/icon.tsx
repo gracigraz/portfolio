@@ -20,7 +20,7 @@ export default async function Icon() {
         justifyContent: "center",
         borderRadius: 16,
         background: "#0f5132",
-        color: "#faf9f4",
+        color: "#fbf7f0",
         fontFamily: "Instrument Serif",
         fontSize: 52,
         paddingBottom: 4,

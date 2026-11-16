@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #faf9f4;
+  --bg: #fbf7f0;
   --ink: #0f5132;
-  --ink-muted: #4f5d4a;
-  --surface: #e8e1d5;
+  --ink-muted: #5c564e;
+  --surface: #ece3d3;
   --accent: #9fba96;
   --highlight: #c8a96b;
   --line: #d6d3c8;
@@ -81,5 +81,27 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Diagrams: boxes lift slightly off the grid; connectors flow in the
+   direction of the data. Motion is off for reduced-motion users. */
+.diagram-box {
+  filter: drop-shadow(0 1px 2px rgb(15 81 50 / 0.12));
+}
+
+.diagram-flow {
+  stroke-dasharray: 5 4;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .diagram-flow {
+    animation: diagram-flow 1.4s linear infinite;
+  }
+}
+
+@keyframes diagram-flow {
+  to {
+    stroke-dashoffset: -9;
   }
 }

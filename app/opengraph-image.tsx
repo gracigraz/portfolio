@@ -21,7 +21,7 @@ export default async function OpengraphImage() {
         flexDirection: "column",
         justifyContent: "space-between",
         padding: 80,
-        background: "#faf9f4",
+        background: "#fbf7f0",
         color: "#0f5132",
         fontFamily: "Instrument Serif",
       }}
@@ -33,7 +33,7 @@ export default async function OpengraphImage() {
           gap: 16,
           fontSize: 26,
           letterSpacing: 4,
-          color: "#4f5d4a",
+          color: "#5c564e",
         }}
       >
         <div
@@ -44,12 +44,12 @@ export default async function OpengraphImage() {
             background: "#c8a96b",
           }}
         />
-        SOFTWARE ENGINEER · MIAMI → NEW YORK
+        SOFTWARE ENGINEER
       </div>
       <div style={{ display: "flex", flexDirection: "column" }}>
         <div style={{ fontSize: 120, lineHeight: 1 }}>{site.name}</div>
-        <div style={{ marginTop: 28, fontSize: 40, color: "#4f5d4a" }}>
-          Case studies: AI agents, internal tools, production debugging
+        <div style={{ marginTop: 28, fontSize: 40, color: "#5c564e" }}>
+          Case studies: content attribution, AI agents, internal tools
         </div>
       </div>
       <div
