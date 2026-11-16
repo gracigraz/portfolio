@@ -37,12 +37,15 @@ export function SocialLinks({ className = "" }: { className?: string }) {
         <li key={label}>
           <a
             href={href}
+            target="_blank"
+            rel="noopener noreferrer"
             className="group inline-flex items-center gap-2 py-2 text-sm font-medium text-ink"
           >
             <Icon />
             <span className="underline decoration-highlight decoration-2 underline-offset-4 transition-colors group-hover:decoration-ink">
               {label}
             </span>
+            <span className="sr-only"> (opens in a new tab)</span>
           </a>
         </li>
       ))}

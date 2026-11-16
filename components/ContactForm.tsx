@@ -191,9 +191,12 @@ export function ContactForm() {
             Message not sent. Please try again, or{" "}
             <a
               href={site.links.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
               className="underline decoration-highlight decoration-2 underline-offset-4"
             >
               message me on LinkedIn
+              <span className="sr-only"> (opens in a new tab)</span>
             </a>
             .
           </span>

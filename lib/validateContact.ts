@@ -14,7 +14,11 @@ export type ContactErrors = Partial<Record<ContactField, string>>;
 export type ValidationResult =
   { ok: true; data: ContactData } | { ok: false; errors: ContactErrors };
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// No whitespace, no extra @, and none of the characters that are special in
+// an email header (<>()[],;:\"), so a valid address is always safe to use as
+// the reply-to.
+const EMAIL_PATTERN =
+  /^[^\s@<>()[\],;:\\"]+@[^\s@<>()[\],;:\\"]+\.[^\s@<>()[\],;:\\"]+$/;
 
 function text(value: unknown) {
   return typeof value === "string" ? value.trim() : "";

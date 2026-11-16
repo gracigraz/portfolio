@@ -45,6 +45,18 @@ describe("validateContact", () => {
     }
   });
 
+  it("rejects characters that would break the reply-to header", () => {
+    for (const email of [
+      'a"<b@example.com',
+      "a,b@example.com",
+      "a;b@example.com",
+      "<ada@example.com>",
+    ]) {
+      const result = validateContact({ ...valid, email });
+      expect(result.ok).toBe(false);
+    }
+  });
+
   it("enforces message length limits", () => {
     const short = validateContact({ ...valid, message: "Too short" });
     const long = validateContact({

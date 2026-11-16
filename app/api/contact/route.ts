@@ -5,8 +5,51 @@ import { validateContact } from "@/lib/validateContact";
 
 const FROM = "Portfolio <onboarding@resend.dev>";
 
+let resendClient: Resend | undefined;
+
+// One client per warm serverless instance, created on first use.
+function getResend() {
+  resendClient ??= new Resend(requireEnv("RESEND_API_KEY"));
+  return resendClient;
+}
+
+// Far above any valid message (5,000 characters), so only abuse is rejected.
+const MAX_BODY_BYTES = 20_000;
+
 export async function POST(request: Request) {
-  const body: unknown = await request.json().catch(() => null);
+  // Check the real body, not the Content-Length header, which can be absent
+  // (chunked requests) or wrong.
+  const raw = await request.text().catch(() => "");
+  if (raw.length > MAX_BODY_BYTES) {
+    return Response.json(
+      { ok: false, error: "Request too large" },
+      { status: 413 },
+    );
+  }
+
+  try {
+    return await handleContact(raw);
+  } catch {
+    // e.g. a missing environment variable: answer in the same JSON shape the
+    // form expects, without leaking details.
+    console.error("contact(): unexpected error");
+    return Response.json(
+      { ok: false, error: "Could not send message" },
+      { status: 500 },
+    );
+  }
+}
+
+function parseJson(raw: string): unknown {
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+async function handleContact(raw: string) {
+  const body: unknown = parseJson(raw);
   if (!body || typeof body !== "object" || Array.isArray(body)) {
     return Response.json(
       { ok: false, error: "Invalid request" },
@@ -73,7 +116,7 @@ async function sendNotification({
   message: string;
 }): Promise<string | null> {
   try {
-    const resend = new Resend(requireEnv("RESEND_API_KEY"));
+    const resend = getResend();
     const { error } = await resend.emails.send({
       from: FROM,
       to: requireEnv("CONTACT_TO_EMAIL"),
